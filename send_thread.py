@@ -5,19 +5,12 @@ import sys
 
 
 class SendMessage(Thread):
-    def __init__(self, route_table :dict, lock :RLock, mcast_group, mcast_port, mcast_delay, mcast_ttl, addrinfo, udp_socket):
+    def __init__(self, route_table :dict, lock :RLock):
 
         Thread.__init__(self)
         self.route_table    = route_table
         self.lock           = lock
-        self.mcast_group    = mcast_group
-        self.mcast_delay    = mcast_delay
-        self.mcast_ttl      = mcast_ttl
-        self.addrinfo       = addrinfo
-        self.udp_socket     = udp_socket
-        self.mcast_port     = mcast_port
             
-
     def run(self):
         try:
             self.hello_sender(route_table='hello')
@@ -78,6 +71,7 @@ class SendMessage(Thread):
 
 
 if __name__ == "__main__":
-    t = SendMessage(route_table='hello', lock=1, mcast_group=None, mcast_port=9999, mcast_delay=None, mcast_ttl=None, addrinfo=None, udp_socket=None)
+    t = SendMessage(route_table='hello', lock=1)
+    t.daemon=True
     t.start()
 
