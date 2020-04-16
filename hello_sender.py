@@ -1,7 +1,7 @@
-from threading import Thread, RLock
+from threading import Thread, RLock, Timer
 from time import sleep
 import socket
-import sys
+import struct
 
 
 class SendMessage(Thread):
@@ -15,7 +15,7 @@ class SendMessage(Thread):
         try:
             self.hello_sender(route_table='hello')
             
-            self.lock.acquire()
+            #self.lock.acquire()
 
         except Exception as e:
             print(f'Failed: {e}')
@@ -34,9 +34,12 @@ class SendMessage(Thread):
         self.mcast_group = 'FF02::1'
         self.addrinfo = socket.getaddrinfo(self.mcast_group, None)[0]
         
+        # Fazer com que o ttl seja interpretado com "packed binary data"
+        self.ttl = struct.pack('@i', self.mcast_ttl)
+        
         try:
             self.udp_socket = socket.socket(self.addrinfo[0], socket.SOCK_DGRAM)
-            self.udp_socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_MULTICAST_HOPS, self.mcast_ttl)
+            self.udp_socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_MULTICAST_HOPS, self.ttl)
             
         except Exception as sock_error:
             print(f'Failed to create socket: {sock_error}')
@@ -45,33 +48,38 @@ class SendMessage(Thread):
 
     def hello_sender(self,route_table):
         '''
-        Envia hello juntamente com a tabela de roteamento (route_table)
-        e fecha o socket e espera 30 segundos (mcast_delay) para voltar a repetir o processo
+        Envia Messagem do tipo "HELLO" juntamente com a tabela de roteamento (route_table)
+        e fecha o socket
         '''
-
         self.mcast_group = 'FF02::1'
         self.mcast_port = 9999
-        self.mcast_delay = 5
+        #self.mcast_delay = 5
 
         while True:
             try:
                 print(f'Sending multicast message to the multicast group: {self.mcast_group} ...')
                 self.create_socket().sendto(self.route_table.encode(), (self.mcast_group,self.mcast_port))
                 
-            except (KeyboardInterrupt, SystemExit) as e:
-                print('Terminating connection with Node ...')
-                break
             except socket.gaierror as sock_error:
                 print(f'Sending error \'gaierror\': {sock_error}')
                 break
             finally:
                 self.create_socket().close()
             
-            sleep(self.mcast_delay)
+            # sleep(self.mcast_delay)
 
+'''
+Cria uma instância da class e executa a thread e depois espera 30 segundos para voltar a repetir o processo
+'''       
+
+def main():
+    print(f'Criando a instancia da class . . . ')
+    hello = SendMessage(
+        route_table='hello',
+        lock=1
+    )
+    print(f'Esperar 5 segundos...')
+    Timer(5.0, main).start()
 
 if __name__ == "__main__":
-    t = SendMessage(route_table='hello', lock=1)
-    t.daemon=True
-    t.start()
-
+    main()
