@@ -1,8 +1,6 @@
 import time
 from threading import Thread, RLock
 
-# 30 seconds interval
-dead_interval = 30000000000
 
 
 class MyLifecycle(Thread):
