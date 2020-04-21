@@ -17,7 +17,7 @@ class Multicast():
         self.lock = RLock()
         self.hello_interval = 15
         self.mcast_ttl = 1
-        self.ttl = struct.pack('@i', mcast_ttl)
+        self.ttl = struct.pack('@i', self.mcast_ttl)
         self.addrinfo = socket.getaddrinfo(self.mcast_group, None, socket.AF_INET6)[0]
 
           
