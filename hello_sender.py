@@ -57,7 +57,7 @@ class SendMessage(Thread):
 
                 for keys, values in list(route_table.items()):
                     if values['next_hop'] == None:
-                    self.msg[keys] = values['timestamp']
+                        self.msg[keys] = values['timestamp']
 
                 print(f'Sending multicast message to the multicast group ...')
                 self.create_socket().sendto(str(self.msg).encode('utf-8'), (self.mcast_group,self.mcast_port))
