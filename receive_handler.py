@@ -1,15 +1,19 @@
 from threading import Thread, RLock
 from json import loads
 from time import time_ns
+from os import kill
+from signal import SIGUSR1
 
 class Receive_Handler(Thread):
-    def __init__(self, route_table :dict, lock :RLock, request):
+    def __init__(self, route_table :dict, lock :RLock, request, localhost):
 
         Thread.__init__(self)
         self.route_table = route_table
+        self.localhost = localhost
         self.lock = lock
         self.skt, self.addr = request  # importar da Class SOCKET
         self.msg = loads(self.skt[0].decode("utf-8"))
+        self.addr = self.addr[0]
 
     
     def run(self):
@@ -19,15 +23,56 @@ class Receive_Handler(Thread):
                 self.hello_handler()
 
             elif self.msg['type'] == 'ROUTE_REQUEST':
-                pass
+                self.lock.acquire()
+                self.rrequest_handler()
 
             elif self.msg['type'] == 'ROUTE_REPLY':
-                pass
-            
-            
+                self.lock.acquire()
+                self.rreply_handler()
+              
         finally:
             self.lock.release()
 
+
+    def rrequest_handler(self):
+        if self.localhost in self.msg['path']:
+            pass
+
+        elif self.msg['dest'] in self.route_table.keys() or self.msg['dest'] == self.localhost:
+            self.msg['type'] = 'ROUTE_REPLY'
+            self.msg['ttl'] = len(self.msg['path']) * 3
+
+            target = self.msg['path'].pop(-1)
+
+            send(target, self.msg)
+        
+        else:
+            self.msg['ttl'] = self.msg['ttl'] - 1
+
+            if self.msg['ttl']:
+                self.msg.append(self.localhost)
+
+                for key, values in self.route_table.items():
+                    if values['next_hop'] == None:
+                        send(key, self.msg)
+
+
+    def rreply_handler(self):
+        if self.msg['dest'] == self.localhost:
+            self.route_table['dest'] = {
+                'timestamp': time_ns(),
+                'next_hop': self.addr
+            }
+
+            kill(self.msg['pid'], SIGUSR1)
+
+        elif self.msg['ttl'] > 1:
+            self.msg['ttl'] = self.msg['ttl'] - 1
+
+            target = self.msg['path'].pop(-1)
+
+            send(target, self.msg)        
+  
     
     def hello_handler(self):
         """
