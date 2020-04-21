@@ -1,16 +1,23 @@
 import socket
 import struct
 from datetime import datetime
-
+from threading import RLock
+from lifecycle import MyLifecycle
+from hello_sender import SendMessage
+from receive_handler import Receive_Handler
 
 class Multicast():
 
     def __init__(self):
         self.mcast_group = 'FF02::1'
         self.mcast_port = 9999
-        self.rcv_msg = ''
-          
+        self.route_table = {}
+        self.dead_interv = 30
+        self.recycle_time = 45
+        self.lock = RLock()
+        self.hello_interval = 15
 
+          
     def create_socket(self):
         self.sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -26,20 +33,30 @@ class Multicast():
 
 
     def receive(self):
+        
+        lifecycle = MyLifecycle(self.route_table, self.lock, self.dead_interv, self.recycle_time)
+        lifecycle.start()
+        self.send()
+
         while True:
+            
             print ("\nWaiting packets")
 
-            self.rcv_msg = str(self.sock.recvfrom(10240))
-            dt = str(datetime.now())
+            rcv_msg = str(self.sock.recvfrom(10240))
+
+            receive_handler = Receive_Handler(self.route_table, self.lock, rcv_msg)
+            receive_handler.start()
 
             # imprime a mensagem recebida com um 'timestamp' provisorio 'dt'
             print ('Receiving data:')
-            print ('|'+str(dt)+' || '+self.rcv_msg+' |')
-    
+            print ('|'+self.rcv_msg+' |')
+        
     
     def send(self):
-        pass
-        #chama a class do Adriano
+        
+        hello_sender = SendMessage(self.hello_interval, self.route_table, self.lock, self.mcast_group, self.mcast_port)
+        hello_sender.start()
+        
 
 net = Multicast()
 
