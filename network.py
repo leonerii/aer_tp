@@ -16,6 +16,9 @@ class Multicast():
         self.recycle_time = 45
         self.lock = RLock()
         self.hello_interval = 15
+        self.mcast_ttl = 1
+        self.ttl = struct.pack('@i', mcast_ttl)
+        self.addrinfo = socket.getaddrinfo(self.mcast_group, None, socket.AF_INET6)[0]
 
           
     def create_socket(self):
