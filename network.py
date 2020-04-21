@@ -33,20 +33,19 @@ class Multicast():
 
 
     def receive(self):
-        
+        local_ip = socket.getaddrinfo(socket.gethostname(),None, socket.AF_INET6)[0][4][0]
         lifecycle = MyLifecycle(self.route_table, self.lock, self.dead_interv, self.recycle_time)
         lifecycle.start()
         #self.send()
+
 
         while True:
             
             print ("\nWaiting packets")
 
-            rcv_msg = self.sock.recvfrom(10240)
-            #print(self.sock.recvfrom(10240))
-            print(rcv_msg)
-
-            receive_handler = Receive_Handler(self.route_table, self.lock, rcv_msg)
+            rcv_msg, addr = self.sock.recvfrom(10240)
+                        
+            receive_handler = Receive_Handler(self.route_table, self.lock, rcv_msg, local_ip)
             receive_handler.start()
 
             # imprime a mensagem recebida com um 'timestamp' provisorio 'dt'
