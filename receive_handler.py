@@ -8,7 +8,7 @@ class Receive_Handler(Thread):
         Thread.__init__(self)
         self.route_table = route_table
         self.lock = lock
-        self.skt, self.addr = request
+        self.skt, self.addr = request  # importar da Class SOCKET
         self.msg = loads(self.skt[0].decode("utf-8"))
 
     
