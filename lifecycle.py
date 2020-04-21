@@ -20,7 +20,7 @@ class MyLifecycle(Thread):
 
             finally:
                 self.lock.release()
-                time.sleep(timesleep)
+                time.sleep(self.timesleep)
 
     def lifecycle_table(self):
         for keys, value in list(self.route_table.items()):
