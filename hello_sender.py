@@ -28,7 +28,7 @@ class SendMessage(Thread):
 
 
             except Exception as e:
-                print(f'Failed: {e}')
+                print('Failed: {}'.format(e))
 
             finally:
                 self.lock.release()
@@ -44,7 +44,7 @@ class SendMessage(Thread):
             self.client_sock.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_MULTICAST_HOPS, self.ttl)
          
         except Exception as sock_error:
-            print(f'Failed to create socket: {sock_error}')
+            print('Failed to create socket: {}'.format(sock_error))
 
     def hello_sender(self):
 
@@ -62,13 +62,14 @@ class SendMessage(Thread):
                 if values['next_hop'] == None:
                     self.msg[keys] = values['timestamp']
 
-            print(self.msg)
-            print(f'Sending multicast message to the multicast group ...')
+
+            print('Sending multicast message to the multicast group ...')
+
             self.client_sock.sendto(str(self.msg).encode('utf-8'), (self.mcast_group,self.mcast_port))
             print("AQUI")
 
         except socket.gaierror as socket_error:
-            print(f'Sending error \'gaierror\': {socket_error}')
+            print('Sending error:'.format(socket_error))
         
         finally:
             self.client_sock.close()
