@@ -40,7 +40,7 @@ class MyThread(Thread):
             """
             Tratar os erros
             """
-            pass
+            print(e.with_traceback())
 
         finally:
             """

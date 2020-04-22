@@ -15,7 +15,7 @@ class Multicast():
         self.dead_interv = 30
         self.recycle_time = 45
         self.lock = RLock()
-        self.hello_interval = 15
+        self.hello_interval = 2
         self.mcast_ttl = 1
         self.ttl = struct.pack('@i', self.mcast_ttl)
         self.addrinfo = socket.getaddrinfo(self.mcast_group, None, socket.AF_INET6)[0]
@@ -39,21 +39,21 @@ class Multicast():
         local_ip = socket.getaddrinfo(socket.gethostname(),None, socket.AF_INET6)[0][4][0]
         lifecycle = MyLifecycle(self.route_table, self.lock, self.dead_interv, self.recycle_time)
         lifecycle.start()
-        #self.send()
-
 
         while True:
             
-            print ("\nWaiting packets")
+            #print ("\nWaiting packets")
 
             rcv_msg = self.sock.recvfrom(10240)
                         
-            receive_handler = Receive_Handler(self.route_table, self.lock, rcv_msg, local_ip)
+            receive_handler = Receive_Handler(self.route_table, self.lock, rcv_msg, local_ip, self.mcast_group, self.mcast_port)
             receive_handler.start()
 
             # imprime a mensagem recebida com um 'timestamp' provisorio 'dt'
-            print ('Receiving data:')
-            print (rcv_msg)
+            #print ('Receiving data:')
+            #print (rcv_msg)
+
+            print(self.route_table)
             
         
     
@@ -67,14 +67,15 @@ class Multicast():
         hello_sender.start()
         
 
-net = Multicast()
+
 
 def main():
+    net = Multicast()
+    
     net.create_socket()
     net.listen()
     net.send()
     net.receive()
-    
     
 
 if __name__ == '__main__':

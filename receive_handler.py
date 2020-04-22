@@ -1,24 +1,22 @@
 from threading import Thread, RLock
 from json import loads
-import time
+from time import time
 from os import kill
 from signal import SIGUSR1
-import msg_unicast
+from msg_unicast import send_unicast
 
 class Receive_Handler(Thread):
-    def __init__(self, route_table :dict, lock :RLock, request, localhost):
+    def __init__(self, route_table :dict, lock :RLock, request, localhost, mcast_addr, mcast_port):
 
         Thread.__init__(self)
         self.route_table = route_table
         self.localhost = localhost
         self.lock = lock
+        self.mcast_port = mcast_port
+        self.mcast_addr = mcast_addr
         self.skt, self.addr = request  # importar da Class SOCKET
-        self.msg = loads(self.skt[0].decode("utf-8"))
-        #self.msg = self.skt.decode("utf-8")
-        #self.msg = loads(self.msg.replace("'", '"'))
-        #self.addr = self.addr[0]
-        
-        
+        self.msg = loads(self.skt.decode("utf-8"))
+        self.addr = self.addr[0]     
         
     
     def run(self):
@@ -41,7 +39,7 @@ class Receive_Handler(Thread):
 
     def rrequest_handler(self):
         if self.localhost in self.msg['path']:
-            pass
+            return
 
         elif self.msg['dest'] in self.route_table.keys() or self.msg['dest'] == self.localhost:
             self.msg['type'] = 'ROUTE_REPLY'
@@ -49,7 +47,7 @@ class Receive_Handler(Thread):
 
             target = self.msg['path'].pop(-1)
 
-            send(target, self.msg)
+            send_unicast(self.msg, target, self.mcast_port)
         
         else:
             self.msg['ttl'] = self.msg['ttl'] - 1
@@ -57,9 +55,7 @@ class Receive_Handler(Thread):
             if self.msg['ttl']:
                 self.msg.append(self.localhost)
 
-                for key, values in self.route_table.items():
-                    if values['next_hop'] == None:
-                        send(key, self.msg)
+                send_unicast(self.msg, self.mcast_addr, self.mcast_port)
 
 
     def rreply_handler(self):
@@ -76,10 +72,13 @@ class Receive_Handler(Thread):
 
             target = self.msg['path'].pop(-1)
 
-            send(target, self.msg)        
+            send_unicast(self.msg, target, self.mcast_port)       
   
     
     def hello_handler(self):
+        if self.addr == self.localhost:
+            return
+
         """
         Apaga uma chave do dicionario para depois iterar somente nas
         chaves que importar para a atualizacao da route_table

@@ -5,6 +5,7 @@ import uuid
 from signal import SIGUSR1
 import struct
 import socket
+from json import dumps
 
 class SendMessage(Thread):
     def __init__(self, route_table :dict, lock :RLock, hello_interval, ttl, mcast_group, mcast_port):
@@ -16,25 +17,20 @@ class SendMessage(Thread):
         self.ttl            = ttl
         self.mcast_group    = mcast_group
         self.mcast_port     = mcast_port
-        self.create_socket()
             
     def run(self):
         while True: 
             try:
                 self.lock.acquire()
-                sleep(5)
                 self.hello_sender()
-                sleep(10)
-
 
             except Exception as e:
-                print('Failed: {}'.format(e))
+                print('Failed: {}'.format(e.with_traceback()))
 
             finally:
                 self.lock.release()
-            
-
-        sleep(self.hello_interval)
+                sleep(self.hello_interval)
+        
     
     def create_socket(self):
 
@@ -53,6 +49,8 @@ class SendMessage(Thread):
         e fecha o socket
         '''
         try:
+            self.create_socket()
+
             # Messagem a ser enviada
             self.msg = {
                 "type": "HELLO"
@@ -62,14 +60,12 @@ class SendMessage(Thread):
                 if values['next_hop'] == None:
                     self.msg[keys] = values['timestamp']
 
-
-            print('Sending multicast message to the multicast group ...')
-
-            self.client_sock.sendto(str(self.msg).encode('utf-8'), (self.mcast_group,self.mcast_port))
-            print("AQUI")
+            #print('Sending multicast message to the multicast group ...')
+            #print(self.msg)
+            self.client_sock.sendto(dumps(self.msg).encode('utf-8'), (self.mcast_group,self.mcast_port))
 
         except socket.gaierror as socket_error:
-            print('Sending error:'.format(socket_error))
+            print('Sending error: {}'.format(socket_error))
         
         finally:
             self.client_sock.close()
