@@ -1,9 +1,11 @@
 from threading import Thread, RLock
 from time import sleep
-import struct
+import os
+import uuid
+from signal import SIGUSR1
 
 class SendMessage(Thread):
-    def __init__(self, route_table :dict, lock :RLock):
+    def __init__(self, route_table :dict, lock :RLock, mcast_group, mcast_port,  hello_interval):
 
         Thread.__init__(self)
         self.route_table    = route_table
@@ -21,9 +23,10 @@ class SendMessage(Thread):
             self.lock.release()
     
     def create_socket(self):
+
         try:
             # Criar o socket do client
-            self.client_sock = socket.socket(self.addrinfo[0], socket.SOCK_DGRAM)
+            self.client_sock = socket.socket(addrinfo[0], socket.SOCK_DGRAM)
             self.client.socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_MULTICAST_HOPS, self.ttl)
          
         except Exception as sock_error:
@@ -35,8 +38,7 @@ class SendMessage(Thread):
         Envia Messagem do tipo "HELLO" juntamente com a tabela de roteamento (route_table)
         e fecha o socket
         '''
-        self.hello_interval = 30
-
+       
         while True:
             try:
                 # Messagem a ser enviada
