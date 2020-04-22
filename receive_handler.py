@@ -13,13 +13,17 @@ class Receive_Handler(Thread):
         self.localhost = localhost
         self.lock = lock
         self.skt, self.addr = request  # importar da Class SOCKET
-        self.msg = loads(self.skt[0].decode("utf-8"))
+        #self.msg = loads(self.skt[0].decode("utf-8"))
+        self.msg = self.skt.decode("utf-8")
+        self.msg = loads(self.msg.replace("'", '"'))
         self.addr = self.addr[0]
-
+        
+        
+        
     
     def run(self):
         try:
-            if self.msg['type'] == 'HELLO':
+            if self.msg["type"] == "HELLO":
                 self.lock.acquire()
                 self.hello_handler()
 

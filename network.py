@@ -53,7 +53,7 @@ class Multicast():
 
             # imprime a mensagem recebida com um 'timestamp' provisorio 'dt'
             print ('Receiving data:')
-            print ('|'+rcv_msg+' |')
+            print (rcv_msg)
             
         
     
