@@ -50,20 +50,20 @@ class SendMessage(Thread):
         '''
         try:
             # Messagem a ser enviada
-        self.msg = {
-            "type": "HELLO"
-        }
+            self.msg = {
+                "type": "HELLO"
+            }
 
-        for keys, values in self.route_table.items():
-            if values['next_hop'] == None:
-                self.msg[keys] = values['timestamp']
+            for keys, values in self.route_table.items():
+                if values['next_hop'] == None:
+                    self.msg[keys] = values['timestamp']
 
-        print(f'Sending multicast message to the multicast group ...')
-        self.client_socket.sendto(str(self.msg).encode('utf-8'), (self.mcast_group,self.mcast_port))
+            print(f'Sending multicast message to the multicast group ...')
+            self.client_sock.sendto(str(self.msg).encode('utf-8'), (self.mcast_group,self.mcast_port))
 
         except socket.gaierror as socket_error:
             print(f'Sending error \'gaierror\': {socket_error}')
-            break
+        
         finally:
-            self.client_socket.close()
+            self.client_sock.close()
     
