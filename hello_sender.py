@@ -59,11 +59,11 @@ class SendMessage(Thread):
                     self.msg[keys] = values['timestamp']
 
             print(f'Sending multicast message to the multicast group ...')
-            self.client_socket.sendto(str(self.msg).encode('utf-8'), (self.mcast_group,self.mcast_port))
+            self.client_sock.sendto(str(self.msg).encode('utf-8'), (self.mcast_group,self.mcast_port))
 
         except socket.gaierror as socket_error:
             print(f'Sending error \'gaierror\': {socket_error}')
-            break
+        
         finally:
-            self.client_socket.close()
+            self.client_sock.close()
     
