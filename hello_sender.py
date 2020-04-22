@@ -22,13 +22,17 @@ class SendMessage(Thread):
         while True: 
             try:
                 self.lock.acquire()
+                sleep(5)
                 self.hello_sender()
+                sleep(10)
+
 
             except Exception as e:
                 print(f'Failed: {e}')
 
             finally:
                 self.lock.release()
+            
 
         sleep(self.hello_interval)
     
@@ -58,8 +62,10 @@ class SendMessage(Thread):
                 if values['next_hop'] == None:
                     self.msg[keys] = values['timestamp']
 
+            print(self.msg)
             print(f'Sending multicast message to the multicast group ...')
             self.client_sock.sendto(str(self.msg).encode('utf-8'), (self.mcast_group,self.mcast_port))
+            print("AQUI")
 
         except socket.gaierror as socket_error:
             print(f'Sending error \'gaierror\': {socket_error}')

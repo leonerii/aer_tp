@@ -1,6 +1,7 @@
 import socket
 import time
 import sys
+from json import dumps
 
 MCAST_GRP = 'FF02::1'
 MCAST_PORT = 9999
@@ -23,7 +24,7 @@ def send():
     while True:
         
         time.sleep(hello_time)
-        sock.sendto(str(msg).encode("utf-8"), (MCAST_GRP, MCAST_PORT))
+        sock.sendto(dumps(msg).encode("utf-8"), (MCAST_GRP, MCAST_PORT))
     
     print ("mensagem enviada\n")
 

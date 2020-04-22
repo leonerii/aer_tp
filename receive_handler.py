@@ -1,6 +1,6 @@
 from threading import Thread, RLock
 from json import loads
-from time import time_ns
+import time
 from os import kill
 from signal import SIGUSR1
 import msg_unicast
@@ -13,10 +13,10 @@ class Receive_Handler(Thread):
         self.localhost = localhost
         self.lock = lock
         self.skt, self.addr = request  # importar da Class SOCKET
-        #self.msg = loads(self.skt[0].decode("utf-8"))
-        self.msg = self.skt.decode("utf-8")
-        self.msg = loads(self.msg.replace("'", '"'))
-        self.addr = self.addr[0]
+        self.msg = loads(self.skt[0].decode("utf-8"))
+        #self.msg = self.skt.decode("utf-8")
+        #self.msg = loads(self.msg.replace("'", '"'))
+        #self.addr = self.addr[0]
         
         
         
@@ -65,7 +65,7 @@ class Receive_Handler(Thread):
     def rreply_handler(self):
         if self.msg['dest'] == self.localhost:
             self.route_table['dest'] = {
-                'timestamp': time_ns(),
+                'timestamp': time(),
                 'next_hop': self.addr
             }
 
@@ -90,7 +90,7 @@ class Receive_Handler(Thread):
         Adiciona ou atualiza a entrada do nó que recebemos a mensagem.
         """
         self.route_table[self.addr] = {
-            'timestamp': time_ns(),
+            'timestamp': time(),
             'next_hop': None
         }
 

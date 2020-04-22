@@ -72,9 +72,10 @@ net = Multicast()
 def main():
     net.create_socket()
     net.listen()
-    net.receive()
-    print("AQUI")
     net.send()
+    net.receive()
+    
+    
 
 if __name__ == '__main__':
     main() 
