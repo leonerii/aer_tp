@@ -40,7 +40,7 @@ class SendMessage(Thread):
             self.client_sock.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_MULTICAST_HOPS, self.ttl)
          
         except Exception as sock_error:
-            print('Failed to create socket: {}'.format(sock_error)')
+            print('Failed to create socket: {}'.format(sock_error))
 
     def hello_sender(self):
 
