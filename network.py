@@ -46,14 +46,13 @@ class Multicast():
             
             print ("\nWaiting packets")
 
-            rcv_msg, addr = self.sock.recvfrom(10240)
+            rcv_msg = self.sock.recvfrom(10240)
                         
             receive_handler = Receive_Handler(self.route_table, self.lock, rcv_msg, local_ip)
             receive_handler.start()
 
             # imprime a mensagem recebida com um 'timestamp' provisorio 'dt'
             print ('Receiving data:')
-            print(addr)
             print ('|'+rcv_msg+' |')
             
         
