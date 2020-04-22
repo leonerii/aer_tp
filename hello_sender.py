@@ -8,7 +8,7 @@ import socket
 from json import dumps
 
 class SendMessage(Thread):
-    def __init__(self, route_table :dict, lock :RLock, hello_interval, ttl, mcast_group, mcast_port):
+    def __init__(self, route_table, lock, hello_interval, ttl, mcast_group, mcast_port):
 
         Thread.__init__(self)
         self.route_table    = route_table

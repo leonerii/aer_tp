@@ -6,7 +6,7 @@ from signal import SIGUSR1
 from msg_unicast import send_unicast
 
 class Receive_Handler(Thread):
-    def __init__(self, route_table :dict, lock :RLock, request, localhost, mcast_addr, mcast_port):
+    def __init__(self, route_table, lock, request, localhost, mcast_addr, mcast_port):
 
         Thread.__init__(self)
         self.route_table = route_table
@@ -16,7 +16,7 @@ class Receive_Handler(Thread):
         self.mcast_addr = mcast_addr
         self.skt, self.addr = request  # importar da Class SOCKET
         self.msg = loads(self.skt.decode("utf-8"))
-        self.addr = self.addr[0]     
+        self.addr = self.addr[0].split('%')[0]
         
     
     def run(self):
@@ -103,7 +103,10 @@ class Receive_Handler(Thread):
         """
         for addr, timestamp in self.msg.items():
 
-            if addr in self.route_table.keys(): 
+            if addr == self.localhost:
+                continue
+
+            elif addr in self.route_table.keys(): 
                 if self.route_table[addr]['timestamp'] < timestamp:
                     self.route_table[addr] = {
                         'timestamp': timestamp,

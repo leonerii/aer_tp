@@ -5,18 +5,19 @@ from threading import RLock
 from lifecycle import MyLifecycle
 from hello_sender import SendMessage
 from receive_handler import Receive_Handler
+from sys import argv
 
 class Multicast():
 
-    def __init__(self):
-        self.mcast_group = 'FF02::1'
-        self.mcast_port = 9999
+    def __init__(self, mcast_group, mcast_port, dead_interv, hello_interval):
+        self.mcast_group = mcast_group
+        self.mcast_port = mcast_port
+        self.dead_interv = dead_interv
+        self.hello_interval = hello_interval
         self.route_table = {}
-        self.dead_interv = 30
-        self.recycle_time = 45
         self.lock = RLock()
-        self.hello_interval = 2
         self.mcast_ttl = 1
+        self.local_ip = argv[1]
         self.ttl = struct.pack('@i', self.mcast_ttl)
         self.addrinfo = socket.getaddrinfo(self.mcast_group, None, socket.AF_INET6)[0]
 
@@ -36,9 +37,10 @@ class Multicast():
 
 
     def receive(self):
-        local_ip = socket.getaddrinfo(socket.gethostname(),None, socket.AF_INET6)[0][4][0]
-        lifecycle = MyLifecycle(self.route_table, self.lock, self.dead_interv, self.recycle_time)
+        lifecycle = MyLifecycle(self.route_table, self.lock, self.dead_interv)
         lifecycle.start()
+
+        print("my ipv6: " + self.local_ip)
 
         while True:
             
@@ -46,7 +48,7 @@ class Multicast():
 
             rcv_msg = self.sock.recvfrom(10240)
                         
-            receive_handler = Receive_Handler(self.route_table, self.lock, rcv_msg, local_ip, self.mcast_group, self.mcast_port)
+            receive_handler = Receive_Handler(self.route_table, self.lock, rcv_msg, self.local_ip, self.mcast_group, self.mcast_port)
             receive_handler.start()
 
             # imprime a mensagem recebida com um 'timestamp' provisorio 'dt'
@@ -70,7 +72,7 @@ class Multicast():
 
 
 def main():
-    net = Multicast()
+    net = Multicast(mcast_group='FF02::1', mcast_port=9999, hello_interval=2, dead_interv=8)
     
     net.create_socket()
     net.listen()
