@@ -53,7 +53,7 @@ class Multicast():
 
             # imprime a mensagem recebida com um 'timestamp' provisorio 'dt'
             print ('Receiving data:')
-            print ('|'+rcv_msg+' |')
+            print (rcv_msg)
             
         
     
@@ -73,6 +73,8 @@ def main():
     net.create_socket()
     net.listen()
     net.receive()
+    print("AQUI")
+    net.send()
 
 if __name__ == '__main__':
     main() 
