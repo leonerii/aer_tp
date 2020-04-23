@@ -1,5 +1,5 @@
 import socket
-
+from json import dumps
 
 
 def create_socket():
@@ -7,6 +7,7 @@ def create_socket():
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     return sock
+    
 def send_unicast(msg, uni_addr, mcast_port):
     sock = create_socket()
-    sock.sendto(str(msg).encode('utf-8'), (uni_addr, mcast_port))
+    sock.sendto(dumps(msg).encode('utf-8'), (uni_addr, mcast_port))

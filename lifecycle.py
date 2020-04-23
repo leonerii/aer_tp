@@ -14,7 +14,7 @@ class MyLifecycle(Thread):
     def run(self):
         while True:
             try:
-                print("rodei")
+                #print("rodei")
                 self.lock.acquire()
                 self.lifecycle_table()
 
