@@ -1,6 +1,7 @@
 from json import dumps, loads
 from time import sleep
 from uuid import uuid4
+from os import system
 import socket
 
 
@@ -22,12 +23,14 @@ def run():
         sock = create_socket()
         msg = {
             'type': 'DATA',
-            'id': uuid4(),
+            'id': str(uuid4()),
             'data': input_data,
             'dest': dest,
             'ttl': 30,
-            'port': sock.getsockname()[1]
+            'source': system("ip addr show  eth0 | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d' | head -1")
         }
+
+        print(msg)
 
         sock.sendto(dumps(msg).encode('utf-8'), ('::1', 9999))
     except Exception as e:
@@ -37,6 +40,4 @@ def run():
         sock.close()
 
 
-
-
-
+run()

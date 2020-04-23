@@ -3,7 +3,7 @@ import struct
 from datetime import datetime
 from threading import RLock
 from lifecycle import MyLifecycle
-from hello_sender import HelloSender
+from hello_sender_v2 import HelloSender
 from receive_handler import Receive_Handler
 from sys import argv
 
@@ -49,11 +49,12 @@ class Multicast():
 
             rcv_msg = self.sock.recvfrom(10240)
                         
-            Receive_Handler(
-                self.route_table, self.lock, rcv_msg, 
-                self.local_ip, self.mcast_group, 
-                self.mcast_port, self.queue
-            ).start()
+            receive_handler = Receive_Handler(
+                                                self.route_table, self.lock, rcv_msg, 
+                                                self.local_ip, self.mcast_group, 
+                                                self.mcast_port, self.queue
+                                            )
+            receive_handler.start()
 
             # imprime a mensagem recebida com um 'timestamp' provisorio 'dt'
             #print ('Receiving data:')
@@ -65,12 +66,16 @@ class Multicast():
     
     def send(self):
         
-        HelloSender( 
-            self.route_table, self.lock, 
-            self.hello_interval, self.mcast_ttl, 
-            self.mcast_group, self.mcast_port
-        ).start()
+        hello_sender = HelloSender( 
+                                    self.route_table, self.lock, 
+                                    self.hello_interval, self.local_ip, 
+                                    self.mcast_ttl, 
+                                    self.mcast_group, self.mcast_port
+                                )
+        hello_sender.start()
         
+
+
 
 def main():
     net = Multicast(mcast_group='FF02::1', mcast_port=9999, hello_interval=2, dead_interv=8)

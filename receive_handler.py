@@ -17,7 +17,7 @@ class Receive_Handler(Thread):
         self.queue = queue
         self.skt, self.addr = request  # importar da Class SOCKET
         self.msg = loads(self.skt.decode("utf-8"))
-        self.addr = self.addr[0].split('%')[0]
+        self.addr = self.msg['source']
         
     
     def run(self):
@@ -37,13 +37,16 @@ class Receive_Handler(Thread):
             elif self.msg['type'] == 'DATA':
                 self.lock.acquire()
                 self.send_data()
+
+        except Exception as e:
+            print(e.with_traceback())    
               
         finally:
             self.lock.release()
 
 
     def send_data(self):
-        if self.msg['dest'] is self.localhost:
+        if self.msg['dest'] == self.localhost:
             print(self.msg['data'])
 
         elif self.msg['dest'] in self.route_table.keys():
@@ -69,7 +72,8 @@ class Receive_Handler(Thread):
                 'id': self.msg['id'],
                 'dest': self.msg['dest'],
                 'ttl': 30,
-                'path': [self.localhost]
+                'path': [self.localhost],
+                'source': self.localhost
             }
 
             send_unicast(rrequest, self.mcast_addr, self.mcast_port)
@@ -124,6 +128,7 @@ class Receive_Handler(Thread):
         chaves que importar para a atualizacao da route_table
         """
         del self.msg['type']
+        del self.msg['source']
 
         """
         Adiciona ou atualiza a entrada do nó que recebemos a mensagem.
