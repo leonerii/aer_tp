@@ -2,8 +2,7 @@ from threading import Thread, RLock
 from time import sleep, time_ns
 from json import dumps
 import os
-import uuid
-from signal import SIGUSR1
+from signal import pause
 import struct
 import socket
 
@@ -72,56 +71,29 @@ class HelloSender(Thread):
 
     def route_request(self, target, msg):
         client_sock = self.create_socket()
-        try:
-            self.id = uuid.uuid4()
-            self.pid = os.getpid()
+        
+        while True:
+            try:
+                self.pid = os.getpid()
+                print(self.pid)
 
-            self.msg = {
+                self.msg = {
                 "type": "ROUTE_REQUEST",
                 "dest": target,
                 "path": [""],
                 "pid": self.pid,
                 "ttl": self.ttl,
-                "id": f'{self.id}'
-            }
-            print(self.msg)
+                }
 
-            print('Route Request ...')
-            client_sock.sendto(dumps(self.msg).encode('utf-8'), (self.mcast_group,self.mcast_port))
+                print('Route Request ...')
+                self.client_sock.sendto(str(self.msg).encode('utf-8'), (self.mcast_group,self.mcast_port))
 
-        except socket.gaierror as socket_error:
-            print('Sending error: {}'.format(socket_error))
-        
-        finally:
-            client_sock.close()    
+            except socket.gaierror as socket_error:
+                print('Sending error:'.format(socket_error))
+            
+            finally:
+                self.client_sock.close()
 
-    def route_reply(self):
-        client_sock = self.create_socket()
-        self.pid = os.getpid()
-        #self.id = uuid.uuid4()
-
-        try:
-            self.msg = {
-            "type": "ROUTE_REPLY",
-            "dest": "target",
-            "path": [""],
-            "pid": self.pid,
-            "ttl": self.ttl
-            }
-            print(self.msg)
-
-            print('Route Request ...')
-            client_sock.sendto(dumps(self.msg).encode('utf-8'), (self.mcast_group,self.mcast_port))
-
-        except socket.gaierror as socket_error:
-            print('Sending error: {}'.format(socket_error))
-        
-        finally:
-            client_sock.close()    
-
-"""
-rota = SendMessage(route_table=1, lock=1, hello_interval=2, ttl=4, mcast_group="FF02::1", mcast_port=9999)
-rota.route_request('localhost', 'route')
-print("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
-rota.route_reply()
-"""
+            # Esperar que o processo seja terminado
+            while self.pid > 0:
+                signal.pause()
