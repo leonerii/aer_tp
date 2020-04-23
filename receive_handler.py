@@ -53,13 +53,13 @@ class Receive_Handler(Thread):
             self.msg['ttl'] = self.msg['ttl'] - 1
 
             if self.msg['ttl']:
-                self.msg.append(self.localhost)
+                self.msg['path'].append(self.localhost)
 
                 send_unicast(self.msg, self.mcast_addr, self.mcast_port)
 
 
     def rreply_handler(self):
-        if self.msg['dest'] == self.localhost:
+        if not len(self.msg['path']):
             self.route_table['dest'] = {
                 'timestamp': time(),
                 'next_hop': self.addr
