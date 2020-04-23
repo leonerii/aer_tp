@@ -3,6 +3,7 @@ from time import sleep
 from uuid import uuid4
 from os import system
 import socket
+import netifaces
 
 
 def create_socket():
@@ -15,7 +16,13 @@ def create_socket():
     except Exception as sock_error:
         print('Failed to create socket: {}'.format(sock_error))
 
+def get_ip():
+    ipv6 = netifaces.ifaddresses('eth0')
+    
+    return ipv6[netifaces.AF_INET6][1]['addr']
+ 
 def run():
+    ipv6 = get_ip()
     try:
         input_data = input('Type your message: ')
         dest = input('Destination address: ')
@@ -27,7 +34,7 @@ def run():
             'data': input_data,
             'dest': dest,
             'ttl': 30,
-            'source': system("ip addr show  eth0 | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d' | head -1")
+            'source': ipv6
         }
 
         print(msg)
@@ -41,3 +48,4 @@ def run():
 
 
 run()
+#print(get_ip())
