@@ -1,5 +1,5 @@
 from threading import Thread, RLock
-from json import loads
+from json import loads, dumps
 from time import time
 from os import kill
 from signal import SIGUSR1
@@ -22,6 +22,7 @@ class Receive_Handler(Thread):
     
     def run(self):
         try:
+            #print(self.msg)
             if self.msg["type"] == "HELLO":
                 self.lock.acquire()
                 self.hello_handler()
