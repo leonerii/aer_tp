@@ -69,8 +69,8 @@ node n4 {
 	!
     }
     canvas c1
-    iconcoords {786.0 142.0}
-    labelcoords {786.0 174.0}
+    iconcoords {823.0 38.0}
+    labelcoords {823.0 70.0}
     interface-peer {eth0 n6}
 }
 
@@ -86,8 +86,8 @@ node n1 {
 	!
     }
     canvas c1
-    iconcoords {695.0 223.0}
-    labelcoords {695.0 255.0}
+    iconcoords {713.0 217.0}
+    labelcoords {713.0 249.0}
     interface-peer {eth0 n6}
     services {DefaultRoute}
 }
@@ -122,8 +122,8 @@ node n3 {
 	!
     }
     canvas c1
-    iconcoords {660.0 369.0}
-    labelcoords {660.0 401.0}
+    iconcoords {685.0 318.0}
+    labelcoords {685.0 350.0}
     services {DefaultRoute}
     interface-peer {eth0 n6}
 }
@@ -140,8 +140,8 @@ node n5 {
 	!
     }
     canvas c1
-    iconcoords {547.0 294.0}
-    labelcoords {547.0 326.0}
+    iconcoords {558.0 285.0}
+    labelcoords {558.0 317.0}
     interface-peer {eth0 n6}
 }
 
@@ -242,8 +242,8 @@ node n12 {
 	!
     }
     canvas c1
-    iconcoords {538.0 437.0}
-    labelcoords {538.0 469.0}
+    iconcoords {537.0 444.0}
+    labelcoords {537.0 476.0}
     interface-peer {eth0 n6}
 }
 
@@ -276,8 +276,8 @@ node n14 {
 	!
     }
     canvas c1
-    iconcoords {651.0 529.0}
-    labelcoords {651.0 561.0}
+    iconcoords {588.0 543.0}
+    labelcoords {588.0 575.0}
     interface-peer {eth0 n6}
 }
 
@@ -373,3 +373,4 @@ option global {
 
 option session {
 }
+

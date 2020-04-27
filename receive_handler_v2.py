@@ -4,7 +4,8 @@ from time import time
 from os import kill
 from signal import SIGUSR1
 from msg_unicast import send_unicast
-from rrequest import send_multicast
+#from mcast_send  import send 
+from rrequest_send import send_multicast
 
 class Receive_Handler(Thread):
     def __init__(self, route_table, lock, request, localhost, mcast_addr, mcast_port, queue):
@@ -109,7 +110,8 @@ class Receive_Handler(Thread):
             if self.msg['ttl']:
                 self.msg['path'].append(self.localhost)
 
-                send_unicast(self.msg, self.mcast_addr, self.mcast_port)
+                #send_unicast(self.msg, self.mcast_addr, self.mcast_port)
+                send_multicast(self.msg, self.mcast_addr, self.mcast_port)
 
 
     def rreply_handler(self):
@@ -121,23 +123,30 @@ class Receive_Handler(Thread):
             print("Destination saved in my route table")
             print("route table: {}".format(self.route_table))
 
-            #Change msg type to data
-            self.msg["type"]="DATA"
+            #Change msg type to data and increase ttl
+            self.msg["type"] = "DATA"
+            self.msg["ttl"] = 40
             
             # change source
             self.msg['source'] = self.localhost
 
             # get the original message from the queue
-            data_msg = self.queue.pop(self.msg['id'], None)
-            
-            next_hop = self.address
-            send_unicast(data_msg, next_hop, self.mcast_port)
-            print('Message: {} Sent to next_hop: {}'.format(data_msg, next_hop))
+            #data_msg = self.queue.pop(self.msg['id'], None)
+            data_msg = self.msg
+            target = self.addr[0]
+            send_unicast(data_msg, target, self.mcast_port)
+            print('Final Message: {} Sent to destination: {}'.format(data_msg, target))
 
 
-        elif self.msg['ttl'] > 1:
+        #elif self.msg['ttl'] > 1:
+        else:
             print("Sending Route Reply to: {}".format(self.msg['path'][-1]))
             self.msg['ttl'] = self.msg['ttl'] - 1
+
+            self.route_table[self.msg['dest']] = {
+                'timestamp': time(),
+                'next_hop': self.address
+            }
 
             target = self.msg['path'].pop(-1)
             print("target: {} TTL={}".format(target,self.msg['ttl']))
@@ -189,4 +198,3 @@ class Receive_Handler(Thread):
                     'timestamp': timestamp,
                     'next_hop': self.address
                 }
-            
