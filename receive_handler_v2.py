@@ -131,8 +131,8 @@ class Receive_Handler(Thread):
             self.msg['source'] = self.localhost
 
             # get the original message from the queue
-            #data_msg = self.queue.pop(self.msg['id'], None)
-            data_msg = self.msg
+            data_msg = self.queue.pop(self.msg['id'], None)
+            #data_msg = self.msg
             target = self.addr[0]
             send_unicast(data_msg, target, self.mcast_port)
             print('Final Message: {} Sent to destination: {}'.format(data_msg, target))
