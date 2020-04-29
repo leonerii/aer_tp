@@ -1,8 +1,6 @@
 from threading import Thread, RLock
 from json import loads, dumps
 from time import time
-from os import kill
-from signal import SIGUSR1
 from msg_unicast import send_unicast
 
 class Receive_Handler(Thread):
