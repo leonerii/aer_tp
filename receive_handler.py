@@ -27,12 +27,10 @@ class Receive_Handler(Thread):
                 self.hello_handler()
 
             elif self.msg['type'] == 'ROUTE_REQUEST':
-                print(dumps(self.msg))
                 self.lock.acquire()
                 self.rrequest_handler()
 
             elif self.msg['type'] == 'ROUTE_REPLY':
-                print(dumps(self.msg))
                 self.lock.acquire()
                 self.rreply_handler()
 
@@ -82,11 +80,11 @@ class Receive_Handler(Thread):
 
 
     def rrequest_handler(self):
-
         if self.localhost in self.msg['path']:
             return
-
+        
         elif self.msg['dest'] in self.route_table.keys() or self.msg['dest'] == self.localhost:
+            print(dumps(self.msg))
             self.msg['type'] = 'ROUTE_REPLY'
             self.msg['ttl'] = len(self.msg['path']) * 3
             self.msg['source'] = self.localhost
@@ -96,6 +94,7 @@ class Receive_Handler(Thread):
             send_unicast(self.msg, target, self.mcast_port)
         
         elif self.msg['ttl'] - 1:
+            print(dumps(self.msg))
             self.msg['ttl'] = self.msg['ttl'] - 1
             self.msg['path'].append(self.localhost)
             self.msg['source'] = self.localhost
@@ -105,6 +104,7 @@ class Receive_Handler(Thread):
 
     def rreply_handler(self):
         if not len(self.msg['path']) and self.msg['id'] in self.queue.keys():
+            print(dumps(self.msg))
             self.route_table['dest'] = {
                 'timestamp': time(),
                 'next_hop': self.addr
@@ -114,9 +114,15 @@ class Receive_Handler(Thread):
 
             send_unicast(data_msg, self.addr, self.mcast_port)
 
-        elif self.msg['ttl'] - 1:
+        elif self.msg['ttl'] - 1 and self.msg['dest'] not in self.route_table.keys():
+            print(dumps(self.msg))
             self.msg['ttl'] = self.msg['ttl'] - 1
             self.msg['source'] = self.localhost
+
+            self.route_table[self.msg['dest']] = {
+                'timestamp': time(),
+                'next_hop': self.addr
+            }
 
             target = self.msg['path'].pop(-1)
 
