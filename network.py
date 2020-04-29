@@ -1,11 +1,12 @@
 import socket
 import struct
+import netifaces
 from datetime import datetime
 from threading import RLock
 from lifecycle import MyLifecycle
 from hello_sender_v2 import HelloSender
 from receive_handler import Receive_Handler
-from sys import argv
+from json import dumps
 
 class Multicast():
 
@@ -18,7 +19,7 @@ class Multicast():
         self.queue = {}
         self.lock = RLock()
         self.mcast_ttl = 1
-        self.local_ip = argv[1]
+        self.local_ip = self.get_ip()
         self.ttl = struct.pack('@i', self.mcast_ttl)
         self.addrinfo = socket.getaddrinfo(self.mcast_group, None, socket.AF_INET6)[0]
 
@@ -26,8 +27,12 @@ class Multicast():
     def create_socket(self):
         self.sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    
 
+    def get_ip(self):
+        ipv6 = netifaces.ifaddresses('eth0')
+        
+        return ipv6[netifaces.AF_INET6][0]['addr']
+    
     def listen(self):
         # abre porta 9999
         self.sock.bind(('', self.mcast_port)) 
@@ -60,7 +65,7 @@ class Multicast():
             #print ('Receiving data:')
             #print (rcv_msg)
 
-            print(self.route_table)
+            #print(dumps(self.route_table, indent=2))
             
         
     

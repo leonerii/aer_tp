@@ -19,7 +19,7 @@ def create_socket():
 def get_ip():
     ipv6 = netifaces.ifaddresses('eth0')
     
-    return ipv6[netifaces.AF_INET6][1]['addr']
+    return ipv6[netifaces.AF_INET6][0]['addr']
  
 def run():
     ipv6 = get_ip()

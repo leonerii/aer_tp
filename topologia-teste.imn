@@ -1,28 +1,19 @@
 node n6 {
+    delay 20000
+    bandwidth 54000000
     type wlan
     network-config {
 	hostname multicast
 	!
 	interface wireless
 	 ip address 10.0.0.0/24
-	 ipv6 address 2001:0::0/64
+	 ipv6 address 2001::0/112
 	!
 	mobmodel
 	coreapi
-	basic_range
+	ns2script
 	ns2script
 	!
-    }
-    custom-config {
-	custom-config-id basic_range
-	custom-command {3 3 9 9 9}
-	config {
-	range=200
-	bandwidth=54000000
-	jitter=0
-	delay=20000
-	error=0
-	}
     }
     custom-config {
 	custom-config-id ns2script
@@ -38,9 +29,20 @@ node n6 {
 	script_stop=
 	}
     }
+    custom-config {
+	custom-config-id basic_range
+	custom-command {3 4 4 4 10}
+	config {
+	range=200
+	bandwidth=54000000
+	jitter=0
+	delay=20000
+	error=0
+	}
+    }
     canvas c1
-    iconcoords {863.0 202.0}
-    labelcoords {863.0 234.0}
+    iconcoords {642.0 245.0}
+    labelcoords {642.0 277.0}
     interface-peer {e0 n3}
     interface-peer {e1 n5}
     interface-peer {e2 n2}
@@ -65,12 +67,13 @@ node n4 {
 	!
 	interface eth0
 	 ip address 10.0.0.24/24
-	 ipv6 address 2001:0::24/64
+	 ipv6 address 2001::24/112
 	!
     }
     canvas c1
-    iconcoords {823.0 38.0}
-    labelcoords {823.0 70.0}
+    iconcoords {624.0 70.0}
+    labelcoords {624.0 102.0}
+    services {DefaultRoute}
     interface-peer {eth0 n6}
 }
 
@@ -82,14 +85,14 @@ node n1 {
 	!
 	interface eth0
 	 ip address 10.0.0.23/24
-	 ipv6 address 2001:0::23/64
+	 ipv6 address 2001::23/112
 	!
     }
     canvas c1
-    iconcoords {713.0 217.0}
-    labelcoords {713.0 249.0}
-    interface-peer {eth0 n6}
+    iconcoords {492.0 260.0}
+    labelcoords {492.0 292.0}
     services {DefaultRoute}
+    interface-peer {eth0 n6}
 }
 
 node n2 {
@@ -100,14 +103,14 @@ node n2 {
 	!
 	interface eth0
 	 ip address 10.0.0.22/24
-	 ipv6 address 2001:0::22/64
+	 ipv6 address 2001::22/112
 	!
     }
     canvas c1
-    iconcoords {768.0 489.0}
-    labelcoords {768.0 521.0}
-    interface-peer {eth0 n6}
+    iconcoords {547.0 532.0}
+    labelcoords {547.0 564.0}
     services {DefaultRoute}
+    interface-peer {eth0 n6}
 }
 
 node n3 {
@@ -118,12 +121,12 @@ node n3 {
 	!
 	interface eth0
 	 ip address 10.0.0.20/24
-	 ipv6 address 2001:0::20/64
+	 ipv6 address 2001::20/112
 	!
     }
     canvas c1
-    iconcoords {685.0 318.0}
-    labelcoords {685.0 350.0}
+    iconcoords {464.0 361.0}
+    labelcoords {464.0 393.0}
     services {DefaultRoute}
     interface-peer {eth0 n6}
 }
@@ -136,12 +139,13 @@ node n5 {
 	!
 	interface eth0
 	 ip address 10.0.0.21/24
-	 ipv6 address 2001:0::21/64
+	 ipv6 address 2001::21/112
 	!
     }
     canvas c1
-    iconcoords {558.0 285.0}
-    labelcoords {558.0 317.0}
+    iconcoords {337.0 328.0}
+    labelcoords {337.0 360.0}
+    services {DefaultRoute}
     interface-peer {eth0 n6}
 }
 
@@ -153,12 +157,13 @@ node n7 {
 	!
 	interface eth0
 	 ip address 10.0.0.25/24
-	 ipv6 address 2001:0::25/64
+	 ipv6 address 2001::25/112
 	!
     }
     canvas c1
-    iconcoords {409.0 195.0}
-    labelcoords {409.0 227.0}
+    iconcoords {188.0 238.0}
+    labelcoords {188.0 270.0}
+    services {DefaultRoute}
     interface-peer {eth0 n6}
 }
 
@@ -170,12 +175,13 @@ node n8 {
 	!
 	interface eth0
 	 ip address 10.0.0.26/24
-	 ipv6 address 2001:0::26/64
+	 ipv6 address 2001::26/112
 	!
     }
     canvas c1
-    iconcoords {555.0 134.0}
-    labelcoords {555.0 166.0}
+    iconcoords {322.0 190.0}
+    labelcoords {322.0 222.0}
+    services {DefaultRoute}
     interface-peer {eth0 n6}
 }
 
@@ -187,12 +193,13 @@ node n9 {
 	!
 	interface eth0
 	 ip address 10.0.0.27/24
-	 ipv6 address 2001:0::27/64
+	 ipv6 address 2001::27/112
 	!
     }
     canvas c1
-    iconcoords {634.0 41.0}
-    labelcoords {634.0 73.0}
+    iconcoords {456.0 83.0}
+    labelcoords {456.0 115.0}
+    services {DefaultRoute}
     interface-peer {eth0 n6}
 }
 
@@ -204,12 +211,13 @@ node n10 {
 	!
 	interface eth0
 	 ip address 10.0.0.28/24
-	 ipv6 address 2001:0::28/64
+	 ipv6 address 2001::28/112
 	!
     }
     canvas c1
-    iconcoords {445.0 92.0}
-    labelcoords {445.0 124.0}
+    iconcoords {268.0 103.0}
+    labelcoords {268.0 135.0}
+    services {DefaultRoute}
     interface-peer {eth0 n6}
 }
 
@@ -221,12 +229,13 @@ node n11 {
 	!
 	interface eth0
 	 ip address 10.0.0.29/24
-	 ipv6 address 2001:0::29/64
+	 ipv6 address 2001::29/112
 	!
     }
     canvas c1
-    iconcoords {444.0 339.0}
-    labelcoords {444.0 371.0}
+    iconcoords {223.0 382.0}
+    labelcoords {223.0 414.0}
+    services {DefaultRoute}
     interface-peer {eth0 n6}
 }
 
@@ -238,12 +247,13 @@ node n12 {
 	!
 	interface eth0
 	 ip address 10.0.0.30/24
-	 ipv6 address 2001:0::30/64
+	 ipv6 address 2001::30/112
 	!
     }
     canvas c1
-    iconcoords {537.0 444.0}
-    labelcoords {537.0 476.0}
+    iconcoords {316.0 487.0}
+    labelcoords {316.0 519.0}
+    services {DefaultRoute}
     interface-peer {eth0 n6}
 }
 
@@ -255,12 +265,13 @@ node n13 {
 	!
 	interface eth0
 	 ip address 10.0.0.31/24
-	 ipv6 address 2001:0::31/64
+	 ipv6 address 2001::31/112
 	!
     }
     canvas c1
-    iconcoords {823.0 302.0}
-    labelcoords {823.0 334.0}
+    iconcoords {602.0 345.0}
+    labelcoords {602.0 377.0}
+    services {DefaultRoute}
     interface-peer {eth0 n6}
 }
 
@@ -272,12 +283,13 @@ node n14 {
 	!
 	interface eth0
 	 ip address 10.0.0.32/24
-	 ipv6 address 2001:0::32/64
+	 ipv6 address 2001::32/112
 	!
     }
     canvas c1
-    iconcoords {588.0 543.0}
-    labelcoords {588.0 575.0}
+    iconcoords {410.0 585.0}
+    labelcoords {410.0 617.0}
+    services {DefaultRoute}
     interface-peer {eth0 n6}
 }
 
@@ -289,69 +301,98 @@ node n15 {
 	!
 	interface eth0
 	 ip address 10.0.0.33/24
-	 ipv6 address 2001:0::33/64
+	 ipv6 address 2001::33/112
 	!
     }
     canvas c1
-    iconcoords {889.0 443.0}
-    labelcoords {889.0 475.0}
+    iconcoords {668.0 486.0}
+    labelcoords {668.0 518.0}
+    services {DefaultRoute}
     interface-peer {eth0 n6}
 }
 
 link l1 {
+    delay 20000
+    bandwidth 54000000
     nodes {n6 n3}
 }
 
 link l2 {
+    delay 20000
     nodes {n6 n5}
+    bandwidth 54000000
 }
 
 link l3 {
+    delay 20000
     nodes {n6 n2}
+    bandwidth 54000000
 }
 
 link l4 {
+    delay 20000
     nodes {n6 n1}
+    bandwidth 54000000
 }
 
 link l5 {
+    delay 20000
     nodes {n6 n4}
+    bandwidth 54000000
 }
 
 link l6 {
+    delay 20000
     nodes {n6 n7}
+    bandwidth 54000000
 }
 
 link l7 {
+    delay 20000
     nodes {n6 n8}
+    bandwidth 54000000
 }
 
 link l8 {
+    delay 20000
     nodes {n6 n9}
+    bandwidth 54000000
 }
 
 link l9 {
+    delay 20000
     nodes {n6 n10}
+    bandwidth 54000000
 }
 
 link l10 {
+    delay 20000
     nodes {n6 n11}
+    bandwidth 54000000
 }
 
 link l11 {
+    delay 20000
     nodes {n6 n12}
+    bandwidth 54000000
 }
 
 link l12 {
+    delay 20000
     nodes {n6 n13}
+    bandwidth 54000000
 }
 
 link l13 {
+    delay 20000
     nodes {n6 n14}
+    bandwidth 54000000
 }
 
 link l14 {
+    delay 20000
     nodes {n6 n15}
+    bandwidth 54000000
 }
 
 canvas c1 {
@@ -372,5 +413,15 @@ option global {
 }
 
 option session {
+    controlnet=
+    controlnet0=
+    controlnet1=
+    controlnet2=
+    controlnet3=
+    controlnet_updown_script=
+    enablerj45=1
+    enablesdt=0
+    preservedir=0
+    sdturl=tcp://127.0.0.1:50000/
 }
 

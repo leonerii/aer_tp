@@ -15,23 +15,24 @@ class Receive_Handler(Thread):
         self.mcast_port = mcast_port
         self.mcast_addr = mcast_addr
         self.queue = queue
-        self.skt, self.addr = request  # importar da Class SOCKET
+        self.skt, _ = request  # importar da Class SOCKET
         self.msg = loads(self.skt.decode("utf-8"))
         self.addr = self.msg['source']
         
     
     def run(self):
         try:
-            #print(self.msg)
             if self.msg["type"] == "HELLO":
                 self.lock.acquire()
                 self.hello_handler()
 
             elif self.msg['type'] == 'ROUTE_REQUEST':
+                print(dumps(self.msg))
                 self.lock.acquire()
                 self.rrequest_handler()
 
             elif self.msg['type'] == 'ROUTE_REPLY':
+                print(dumps(self.msg))
                 self.lock.acquire()
                 self.rreply_handler()
 
@@ -81,28 +82,29 @@ class Receive_Handler(Thread):
 
 
     def rrequest_handler(self):
+
         if self.localhost in self.msg['path']:
             return
 
         elif self.msg['dest'] in self.route_table.keys() or self.msg['dest'] == self.localhost:
             self.msg['type'] = 'ROUTE_REPLY'
             self.msg['ttl'] = len(self.msg['path']) * 3
+            self.msg['source'] = self.localhost
 
             target = self.msg['path'].pop(-1)
 
             send_unicast(self.msg, target, self.mcast_port)
         
-        else:
+        elif self.msg['ttl'] - 1:
             self.msg['ttl'] = self.msg['ttl'] - 1
+            self.msg['path'].append(self.localhost)
+            self.msg['source'] = self.localhost
 
-            if self.msg['ttl']:
-                self.msg['path'].append(self.localhost)
-
-                send_unicast(self.msg, self.mcast_addr, self.mcast_port)
+            send_unicast(self.msg, self.mcast_addr, self.mcast_port)
 
 
     def rreply_handler(self):
-        if not len(self.msg['path']):
+        if not len(self.msg['path']) and self.msg['id'] in self.queue.keys():
             self.route_table['dest'] = {
                 'timestamp': time(),
                 'next_hop': self.addr
@@ -112,8 +114,9 @@ class Receive_Handler(Thread):
 
             send_unicast(data_msg, self.addr, self.mcast_port)
 
-        elif self.msg['ttl'] > 1:
+        elif self.msg['ttl'] - 1:
             self.msg['ttl'] = self.msg['ttl'] - 1
+            self.msg['source'] = self.localhost
 
             target = self.msg['path'].pop(-1)
 
