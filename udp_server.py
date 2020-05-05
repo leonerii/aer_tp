@@ -1,6 +1,7 @@
 import socket
 import struct
 import netifaces
+from threading import Thread
 from datetime import datetime
 from threading import RLock
 from lifecycle import MyLifecycle
@@ -8,9 +9,12 @@ from hello_sender_v2 import HelloSender
 from receive_handler import Receive_Handler
 from json import dumps
 
-class Multicast():
+class UDP_Server(Thread):
 
+    
     def __init__(self, mcast_group, mcast_port, dead_interv, hello_interval):
+        Thread.__init__(self)
+
         self.mcast_group = mcast_group
         self.mcast_port = mcast_port
         self.dead_interv = dead_interv
@@ -78,10 +82,16 @@ class Multicast():
                                     self.mcast_group, self.mcast_port
                                 )
         hello_sender.start()
+
+
+    def run(self):
+        self.create_socket()
+        self.listen()
+        self.send()
+        self.receive()
         
 
-
-
+"""
 def main():
     net = Multicast(mcast_group='FF02::1', mcast_port=9999, hello_interval=2, dead_interv=8)
     
@@ -89,7 +99,4 @@ def main():
     net.listen()
     net.send()
     net.receive()
-    
-
-if __name__ == '__main__':
-    main() 
+"""
