@@ -12,7 +12,7 @@ from json import dumps
 class UDP_Server(Thread):
 
     
-    def __init__(self, mcast_group, mcast_port, dead_interv, hello_interval):
+    def __init__(self, localhost, mcast_group, mcast_port, dead_interv, hello_interval):
         Thread.__init__(self)
 
         self.mcast_group = mcast_group
@@ -23,7 +23,7 @@ class UDP_Server(Thread):
         self.queue = {}
         self.lock = RLock()
         self.mcast_ttl = 1
-        self.local_ip = self.get_ip()
+        self.local_ip = localhost
         self.ttl = struct.pack('@i', self.mcast_ttl)
         self.addrinfo = socket.getaddrinfo(self.mcast_group, None, socket.AF_INET6)[0]
 
@@ -32,11 +32,7 @@ class UDP_Server(Thread):
         self.sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-    def get_ip(self):
-        ipv6 = netifaces.ifaddresses('eth0')
-        
-        return ipv6[netifaces.AF_INET6][0]['addr']
-    
+
     def listen(self):
         # abre porta 9999
         self.sock.bind(('', self.mcast_port)) 

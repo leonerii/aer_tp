@@ -2,7 +2,7 @@ import socket
 from json import dumps
 from time import time
 
-class TCPServerHandler()
+class TCPServerHandler():
 
     # def create_socket(self):
         
@@ -19,7 +19,7 @@ class TCPServerHandler()
         
         # sock = create_socket()
         if self.msg['dest'] == self.localhost:
-            if self.msg['data']['type']] == 'POST':
+            if self.msg['data']['type'] == 'POST':
                 print('Save data to the database')
                 self.database[self.msg['data']['data']['rodovia']] = self.msg['data']['data']
                 
@@ -29,7 +29,7 @@ class TCPServerHandler()
                 
                 send_tcp('data saved', localhost, 9999)
 
-            elif self.msg['data']['type']] == 'GET':
+            elif self.msg['data']['type'] == 'GET':
                 print('Get data in the database')
                 self.msg['data']['data'] = self.database[self.msg['data']['data']['rodovia']]
                 

@@ -13,26 +13,50 @@ class TCP_Server(Thread):
         self.port = port
         self.socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         self.socket.bind((self.localhost, self.port))
+        self.msg = {}
+        self.database = {}
 
 
     def run(self):
         self.socket.listen()
 
         while True:
-            conn, _ = self.socket.accept()
+            """
+            Inicialização das variaveis
+            """
+            self.conn, _ = self.socket.accept()
+            self.msg = load(self.conn.recv(1024))
 
-            data = load(conn.recv(1024))
+            """
+            Tratar a mensagem recebida aqui
+            """
 
-            msg = {
-                'type': 'DATA',
-                'id': str(uuid4()),
-                'data': data,
-                'dest': self.localhost,
-                'ttl': 30,
-                'source': self.localhost
-            }
 
-            send_unicast(msg, self.localhost, 9999)
+    def request_handler(self):
+        
+        # sock = create_socket()
+        # send_tcp = self.conn.sendall($message)
+
+        if self.msg['dest'] == self.localhost:
+            if self.msg['data']['type'] == 'POST':
+                print('Save data to the database')
+                self.database[self.msg['data']['data']['rodovia']] = self.msg['data']['data']
+                
+                # Change src and dest
+                self.msg['dest'] = self.msg['source']
+                self.msg['source'] = self.localhost
+                
+                send_tcp('data saved', self.localhost, 9999)
+
+            elif self.msg['data']['type'] == 'GET':
+                print('Get data in the database')
+                self.msg['data']['data'] = self.database[self.msg['data']['data']['rodovia']]
+                
+                # Change src and dest
+                self.msg['dest'] = self.msg['source']
+                self.msg['source'] = self.localhost
+
+                send_tcp(self.msg, self.localhost, 9999)
 
 
 
