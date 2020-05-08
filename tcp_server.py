@@ -3,6 +3,7 @@ from threading import Thread
 from json import load, dumps
 from uuid import uuid4
 from msg_unicast import send_unicast
+from time import time_ns
 
 
 class TCP_Server(Thread):
@@ -34,30 +35,47 @@ class TCP_Server(Thread):
 
     def request_handler(self):
         
-        # sock = create_socket()
-        # send_tcp = self.conn.sendall($message)
+        try:
+            if self.msg['type'] == 'POST':
+                print('Saving data to the database ...')
+                event_key = self.msg['data']['rodovia']
 
-        if self.msg['dest'] == self.localhost:
-            if self.msg['data']['type'] == 'POST':
-                print('Save data to the database')
-                self.database[self.msg['data']['data']['rodovia']] = self.msg['data']['data']
+                # TODO: Analisar o que fazer quando tentar fazer POST de informação sobre uma rodovia que já existe na base de dados
+                if event_key in self.database.keys() and self.msg['data']['timestamp'] > self.database[event_key]['timestamp']: 
+                    #event_key = event_key + '_v2'
+                    self.database[event_key]['type_v'] = self.msg['data']
+                    self.database[event_key]['reporter'] = self.msg['source']
+                    self.database[event_key]['timestamp'] = time_ns()
+                    print(self.database)
+                    self.conn.send("data saved".encode('utf-8'))
+
+                else:
+                    self.database[event_key] = self.msg['data']
+                    self.database[event_key]['reporter'] = self.msg['source']
+                    self.database[event_key]['timestamp'] = time_ns()
+                    print(self.database)
+
+                    self.conn.send("data saved".encode('utf-8'))
                 
-                # Change src and dest
-                self.msg['dest'] = self.msg['source']
-                self.msg['source'] = self.localhost
-                
-                send_tcp('data saved', self.localhost, 9999)
+            elif self.msg['type'] == 'GET':
+                print('Get data from the database')
+                event_key = self.msg['data']['rodovia']
+                if self.msg['data']['rodovia'] in self.database.keys():
+                    self.msg['data'] = self.database[msg['data']['rodovia']]
+                    print(self.msg['data'])
 
-            elif self.msg['data']['type'] == 'GET':
-                print('Get data in the database')
-                self.msg['data']['data'] = self.database[self.msg['data']['data']['rodovia']]
-                
-                # Change src and dest
-                self.msg['dest'] = self.msg['source']
-                self.msg['source'] = self.localhost
+                    self.conn.send(dumps(self.msg['data']).encode('utf-8'))
 
-                send_tcp(self.msg, self.localhost, 9999)
+                else:
+                    database_info_list = []
+                    for key in self.database.keys():
+                        database_info_list.append(key)
+                    #raise Exception(f'Requested information \'{event_key}\' not found on the database')
+                    print(f'Requested information \'{event_key}\' not found on local database')
+                    self.conn.send(str(database_info_list).encode('utf-8'))
 
+        except Exception as e:
+            print(e)
 
-
-
+        finally:
+            self.conn.close()
