@@ -33,21 +33,15 @@ def send_message():
             'data': interface
             }
 
-        # Enviar a mensagem multicast
         print(f'Sending message {msg} to: {localhost} ...')
         sock.connect((localhost, port))
         sock.sendall(dumps(msg).encode("utf-8"))
 
-        # Resposta do Receiver
+        # Resposta
         received_msg = sock.recvfrom(4096)
         print('Preparing to receive back')
         response = received_msg[0].decode()
         print(f'Message Received: {response}')
-
-        # src_ip = received_msg[1][0]
-        
-        # # Imprimir a mensagem recebida
-        # print(f'Received from {src_ip}: {response}')
         
     except (KeyboardInterrupt, SystemExit) as e:
         print('Terminating connection with Node ...')
