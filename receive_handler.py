@@ -1,3 +1,4 @@
+import socket
 from threading import Thread, RLock
 from json import loads, dumps
 from time import time
@@ -45,7 +46,13 @@ class Receive_Handler(Thread):
 
     def send_data(self):
         if self.msg['dest'] == self.localhost:
-            print(self.msg['data'])
+            """
+            Enviar a mensagem para o server TCP localhost
+            """
+            tcp_sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+            tcp_sock.connect((self.localhost, self.mcast_port))
+            tcp_sock.sendall(dumps(self.msg['data']).encode("utf-8"))
+            tcp_sock.close()
 
         elif self.msg['dest'] in self.route_table.keys():
             self.msg['ttl'] = self.msg['ttl'] - 1

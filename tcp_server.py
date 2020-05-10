@@ -1,6 +1,6 @@
 import socket
 from threading import Thread
-from json import load, dumps
+from json import loads, dumps
 from uuid import uuid4
 from msg_unicast import send_unicast
 from time import time_ns
@@ -10,9 +10,11 @@ class TCP_Server(Thread):
     def __init__(self, localhost, port=9999):
         Thread.__init__(self)
 
-        self.localhost = localhost
+        #self.localhost = localhost
+        self.localhost = '127.0.0.1'
         self.port = port
-        self.socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #self.socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         self.socket.bind((self.localhost, self.port))
         self.msg = {}
         self.database = {}
@@ -26,11 +28,21 @@ class TCP_Server(Thread):
             Inicialização das variaveis
             """
             self.conn, _ = self.socket.accept()
-            self.msg = load(self.conn.recv(1024))
+            self.msg = loads(self.conn.recv(1024))
 
             """
             Tratar a mensagem recebida aqui
             """
+
+            if not self.msg['dest'] == self.localhost:
+                """
+                Mandar mensagem pro server UDP localhost.
+                Fazer o encapsulamento da mensagem.
+                Abrir socket UDP e enviar a mensagem com type DATA
+                """
+            
+            elif self.msg['dest'] == self.localhost:
+                self.request_handler()
 
 
     def request_handler(self):
@@ -61,7 +73,7 @@ class TCP_Server(Thread):
                 print('Get data from the database')
                 event_key = self.msg['data']['rodovia']
                 if self.msg['data']['rodovia'] in self.database.keys():
-                    self.msg['data'] = self.database[msg['data']['rodovia']]
+                    self.msg['data'] = self.database[self.msg['data']['rodovia']]
                     print(self.msg['data'])
 
                     self.conn.send(dumps(self.msg['data']).encode('utf-8'))
