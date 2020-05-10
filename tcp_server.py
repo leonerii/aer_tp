@@ -29,17 +29,27 @@ class TCP_Server(Thread):
             """
             self.conn, _ = self.socket.accept()
             self.msg = loads(self.conn.recv(1024))
-
             """
             Tratar a mensagem recebida aqui
             """
 
             if not self.msg['dest'] == self.localhost:
                 """
-                Mandar mensagem pro server UDP localhost.
                 Fazer o encapsulamento da mensagem.
                 Abrir socket UDP e enviar a mensagem com type DATA
+                Mandar mensagem pro server UDP localhost.
+                Aguardar a resposta atavés do socket TCP.
+                
+                aux_conn, _ self.socket.accept()
+                self.msg = loads(self.aux_conn.recv(1024))
+                aux_conn.close()
+
+                Mandar a mensagem de volta a interface desencapsulada.
+
+                self.conn.sendall(self.msg['data'])
                 """
+                
+
             
             elif self.msg['dest'] == self.localhost:
                 self.request_handler()

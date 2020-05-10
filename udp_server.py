@@ -1,6 +1,5 @@
 import socket
 import struct
-import netifaces
 from threading import Thread
 from datetime import datetime
 from threading import RLock

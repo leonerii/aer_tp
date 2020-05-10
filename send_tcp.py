@@ -31,7 +31,7 @@ def send_message():
             'source': localhost,
             'dest': localhost,
             'data': interface
-            }
+        }
 
         print(f'Sending message {msg} to: {localhost} ...')
         sock.connect((localhost, port))
