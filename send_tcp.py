@@ -13,23 +13,23 @@ def send_message():
     except Exception as sock_error:
         print(f'Failed to create socket: {sock_error}')
 
-    #while True:
     try:
         
         road = input(f'Please enter the road reference: ')
         interface  = {
-            'rodovia': road,
+            'road': road,
             'type' : 'accident',
-            'reference' : 'close to A3',
+            'ref' : 'close to A3',
             'timestamp' : time_ns()
         }
 
         method = input(f'Please enter message method GET|POST: ')
+        dest = input(f'Please enter the destination for the msg: ')
 
         msg = {
             'type': method,
             'source': localhost,
-            'dest': localhost,
+            'dest': dest,
             'data': interface
         }
 

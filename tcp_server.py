@@ -48,7 +48,7 @@ class TCP_Server(Thread):
 
                 self.conn.sendall(self.msg['data'])
                 """
-                
+                self.route_request()
 
             
             elif self.msg['dest'] == self.localhost:
@@ -60,44 +60,66 @@ class TCP_Server(Thread):
         try:
             if self.msg['type'] == 'POST':
                 print('Saving data to the database ...')
-                event_key = self.msg['data']['rodovia']
+                event_key = self.msg['data']['road']
 
-                # TODO: Analisar o que fazer quando tentar fazer POST de informação sobre uma rodovia que já existe na base de dados
-                if event_key in self.database.keys() and self.msg['data']['timestamp'] > self.database[event_key]['timestamp']: 
-                    #event_key = event_key + '_v2'
-                    self.database[event_key]['type_v'] = self.msg['data']
-                    self.database[event_key]['reporter'] = self.msg['source']
-                    self.database[event_key]['timestamp'] = time_ns()
-                    print(self.database)
+                if event_key in self.database.keys():
+                    self.msg[data]['road']['reporter'] = self.msg['source']
+                    self.msg[data]['road']['timestamp'] = time_ns()
+                    self.database[event_key].append(self.msg['data'])
+                    
                     self.conn.send("data saved".encode('utf-8'))
 
                 else:
+                    self.msg[data]['road']['reporter'] = self.msg['source']
+                    self.msg[data]['road']['timestamp'] = time_ns()
                     self.database[event_key] = self.msg['data']
-                    self.database[event_key]['reporter'] = self.msg['source']
-                    self.database[event_key]['timestamp'] = time_ns()
-                    print(self.database)
-
+                    
                     self.conn.send("data saved".encode('utf-8'))
                 
             elif self.msg['type'] == 'GET':
-                print('Get data from the database')
-                event_key = self.msg['data']['rodovia']
-                if self.msg['data']['rodovia'] in self.database.keys():
-                    self.msg['data'] = self.database[self.msg['data']['rodovia']]
-                    print(self.msg['data'])
+                print('Getting data from the database ...')
+                event_key = self.msg['data']['road']
 
+                if self.msg['data']['road'] in self.database.keys():
+                    self.msg['data'] = self.database[msg['data']['road']]
+                    
                     self.conn.send(dumps(self.msg['data']).encode('utf-8'))
 
                 else:
-                    database_info_list = []
-                    for key in self.database.keys():
-                        database_info_list.append(key)
-                    #raise Exception(f'Requested information \'{event_key}\' not found on the database')
-                    print(f'Requested information \'{event_key}\' not found on local database')
-                    self.conn.send(str(database_info_list).encode('utf-8'))
+                    database_info_list = [key for key in self.database.keys()]
+                    response = f'{event_key} - not found DB. \nFound: {database_info_list}'
+                    self.conn.send(str(response).encode('utf-8'))
 
         except Exception as e:
             print(e)
 
         finally:
             self.conn.close()
+
+    
+    def route_request(self):
+        print('Routing request . . . ')
+        
+        self.msg = {
+        'type': 'DATA',
+        'id': str(uuid4()),
+        'data': self.msg,
+        'dest': self.msg['dest'],
+        'ttl': 30,
+        'source': self.localhost
+        }
+        
+        udp_socket = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+        udp_socket.sendto(dumps(self.msg).encode('utf-8'), (self.localhost, 9999))
+        print(f'Message sent {self.msg}')
+
+        # Resposta
+        udp_response = udp_socket.recvfrom(1024)
+        udp_socket.close()
+        print(f'CLOSING UDP SOCKET')
+       
+        # Enviar mensagem ao client
+        self.msg = loads(udp_response[0].decode('utf-8'))
+       # print(msg)
+        self.conn.sendall(dumps(self.msg['data']).encode('utf-8'))
+       
