@@ -2,6 +2,7 @@ import socket
 from json import dumps
 import uuid
 from time import time_ns
+#from interface import GUI
 
 localhost = '127.0.0.1'
 port = 9999
@@ -14,7 +15,11 @@ def send_message():
         print(f'Failed to create socket: {sock_error}')
 
     try:
+        """
+        Utiliza dictionary 'mensagem' da função 'post()':
+
         
+        """
         road = input(f'Please enter the road reference: ')
         interface  = {
             'road': road,
