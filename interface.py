@@ -3,6 +3,7 @@ from tkinter import scrolledtext
 from tkinter.ttk import *
 import json
 
+
 class GUI():
     def __init__(self):
         
