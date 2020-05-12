@@ -5,7 +5,7 @@ import json
 import time
 
 
-class GUI():
+class Gui():
     def __init__(self):
         
         self.window_ask = Tk()
@@ -123,7 +123,7 @@ class GUI():
         #self.window_post.mainloop() 
 
 def main():
-    gui = GUI()
+    gui = Gui()
     
 
 if __name__ == '__main__':

@@ -1,8 +1,9 @@
 import socket
 from json import dumps
 import uuid
-from time import time_ns
-#from interface import GUI
+#from time import time_ns
+import time
+#from interface import Gui
 
 localhost = '127.0.0.1'
 port = 9999
@@ -16,16 +17,14 @@ def send_message():
 
     try:
         """
-        Utiliza dictionary 'mensagem' da função 'post()':
-
-        
+        Utilizar dictionary 'mensagem' da função 'post()':
         """
         road = input(f'Please enter the road reference: ')
         interface  = {
             'road': road,
             'type' : 'accident',
             'ref' : 'close to A3',
-            'timestamp' : time_ns()
+            'timestamp' : time.time()
         }
 
         method = input(f'Please enter message method GET|POST: ')
