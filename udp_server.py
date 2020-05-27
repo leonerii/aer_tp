@@ -4,7 +4,7 @@ from threading import Thread
 from datetime import datetime
 from threading import RLock
 from lifecycle import MyLifecycle
-from hello_sender_v2 import HelloSender
+from hello_sender import HelloSender
 from receive_handler import Receive_Handler
 from json import dumps
 

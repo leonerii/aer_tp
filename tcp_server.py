@@ -2,7 +2,7 @@ import socket
 from threading import Thread
 from json import loads, dumps
 from uuid import uuid4
-from msg_unicast import send_unicast
+from send_data import udp_data
 from time import time_ns
 
 
@@ -122,4 +122,3 @@ class TCP_Server(Thread):
         self.msg = loads(udp_response[0].decode('utf-8'))
        # print(msg)
         self.conn.sendall(dumps(self.msg['data']).encode('utf-8'))
-       

@@ -2,7 +2,7 @@ import socket
 from threading import Thread, RLock
 from json import loads, dumps
 from time import time
-from msg_unicast import send_unicast
+from send_data import udp_data
 
 class Receive_Handler(Thread):
     def __init__(self, route_table, lock, request, localhost, mcast_addr, mcast_port, queue):
@@ -63,11 +63,11 @@ class Receive_Handler(Thread):
             target = self.msg['dest']
 
             if self.route_table[target]['next_hop'] is None:
-                send_unicast(self.msg, target, self.mcast_port)
+                udp_data(self.msg, target, self.mcast_port)
 
             else:
                 next_hop = self.route_table[target]['next_hop']
-                send_unicast(self.msg, next_hop, self.mcast_port)
+                udp_data(self.msg, next_hop, self.mcast_port)
 
         elif self.msg['dest'] not in self.route_table.keys():
             self.queue[self.msg['id']] = self.msg
@@ -81,7 +81,7 @@ class Receive_Handler(Thread):
                 'source': self.localhost
             }
 
-            send_unicast(rrequest, self.mcast_addr, self.mcast_port)
+            udp_data(rrequest, self.mcast_addr, self.mcast_port)
 
 
     def rrequest_handler(self):
@@ -96,7 +96,7 @@ class Receive_Handler(Thread):
 
             target = self.msg['path'].pop(-1)
 
-            send_unicast(self.msg, target, self.mcast_port)
+            udp_data(self.msg, target, self.mcast_port)
         
         elif self.msg['ttl'] - 1:
             print(dumps(self.msg))
@@ -104,7 +104,7 @@ class Receive_Handler(Thread):
             self.msg['path'].append(self.localhost)
             self.msg['source'] = self.localhost
 
-            send_unicast(self.msg, self.mcast_addr, self.mcast_port)
+            udp_data(self.msg, self.mcast_addr, self.mcast_port)
 
 
     def rreply_handler(self):
@@ -117,7 +117,7 @@ class Receive_Handler(Thread):
 
             data_msg = self.queue.pop(self.msg['id'])
 
-            send_unicast(data_msg, self.addr, self.mcast_port)
+            udp_data(data_msg, self.addr, self.mcast_port)
 
         elif self.msg['ttl'] - 1 and self.msg['dest'] not in self.route_table.keys():
             print(dumps(self.msg))
@@ -131,7 +131,7 @@ class Receive_Handler(Thread):
 
             target = self.msg['path'].pop(-1)
 
-            send_unicast(self.msg, target, self.mcast_port)       
+            udp_data(self.msg, target, self.mcast_port)       
   
     
     def hello_handler(self):
