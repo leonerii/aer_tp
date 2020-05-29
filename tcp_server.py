@@ -63,15 +63,15 @@ class TCP_Server(Thread):
                 event_key = self.msg['data']['road']
 
                 if event_key in self.database.keys():
-                    self.msg[data]['road']['reporter'] = self.msg['source']
-                    self.msg[data]['road']['timestamp'] = time_ns()
+                    self.msg['data']['road']['reporter'] = self.msg['source']
+                    self.msg['data']['road']['timestamp'] = time_ns()
                     self.database[event_key].append(self.msg['data'])
                     
                     self.conn.send("data saved".encode('utf-8'))
 
                 else:
-                    self.msg[data]['road']['reporter'] = self.msg['source']
-                    self.msg[data]['road']['timestamp'] = time_ns()
+                    self.msg['data']['road']['reporter'] = self.msg['source']
+                    self.msg['data']['road']['timestamp'] = time_ns()
                     self.database[event_key] = self.msg['data']
                     
                     self.conn.send("data saved".encode('utf-8'))
@@ -81,7 +81,7 @@ class TCP_Server(Thread):
                 event_key = self.msg['data']['road']
 
                 if self.msg['data']['road'] in self.database.keys():
-                    self.msg['data'] = self.database[msg['data']['road']]
+                    self.msg['data'] = self.database[self.msg['data']['road']]
                     
                     self.conn.send(dumps(self.msg['data']).encode('utf-8'))
 
