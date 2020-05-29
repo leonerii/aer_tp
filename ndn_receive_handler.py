@@ -6,7 +6,7 @@ from uuid import uuid4
 from send_data import udp_data
 
 class Receive_Handler(Thread):
-    def __init__(self, lock, pit, fib, cs, conn, queue, localhost, udp_port=9999):
+    def __init__(self, lock, pit, fib, cs, conn, localhost, udp_port=9999):
 
         Thread.__init__(self)
         self.pit = pit
@@ -14,7 +14,6 @@ class Receive_Handler(Thread):
         self.lock = lock
         self.cs = cs
         self.conn = conn
-        self.queue = queue
         self.localhost = localhost
         self.udp_port = udp_port
         self.msg = loads(self.conn.decode("utf-8"))

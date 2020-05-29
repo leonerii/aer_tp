@@ -54,6 +54,20 @@ class Receive_Handler(Thread):
             tcp_sock.sendall(dumps(self.msg['data']).encode("utf-8"))
             tcp_sock.close()
 
+        elif self.msg['dest'] == 'multicast':
+            if not self.msg['id'] in self.queue.keys():            
+                self.msg['ttl'] = self.msg['ttl'] - 1
+
+                if not self.msg['ttl']:
+                    return
+
+                self.queue[self.msg['id']] = ""
+                
+                udp_data(self.msg, self.mcast_addr, self.mcast_port)
+
+            else:
+                del self.queue[self.msg['id']]
+
         elif self.msg['dest'] in self.route_table.keys():
             self.msg['ttl'] = self.msg['ttl'] - 1
 
