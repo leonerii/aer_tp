@@ -10,11 +10,9 @@ class TCP_Server(Thread):
     def __init__(self, localhost, port=9999):
         Thread.__init__(self)
 
-        #self.localhost = localhost
-        self.localhost = '127.0.0.1'
+        self.localhost = localhost
         self.port = port
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #self.socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        self.socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         self.socket.bind((self.localhost, self.port))
         self.msg = {}
         self.database = {}

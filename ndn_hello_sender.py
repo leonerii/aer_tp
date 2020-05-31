@@ -3,9 +3,10 @@ from time import sleep
 from json import dumps
 from uuid import uuid4
 import socket
+import send_data
 
 class NDN_HelloSender(Thread):
-    def __init__(self, lock, hello_interval, cs, localhost, mcast_addr, mcast_port):
+    def __init__(self, lock, hello_interval, cs, fib, localhost, mcast_addr, mcast_port):
 
         Thread.__init__(self)
         self.lock           = lock
@@ -14,6 +15,7 @@ class NDN_HelloSender(Thread):
         self.mcast_group    = mcast_addr
         self.mcast_port     = mcast_port
         self.cs             = cs     # Content Store
+        self.fib            = fib
 
     def run(self):
         while True:
@@ -35,7 +37,6 @@ class NDN_HelloSender(Thread):
         Envia Messagem do tipo "HELLO" com informação em CS e FIB
         '''
         try:
-            sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
             # Hello message to be sent
             self.msg = {
                 "type": "HELLO",
@@ -43,17 +44,21 @@ class NDN_HelloSender(Thread):
 
             if self.cs:
                 for named_data in self.cs.keys():
-                    self.msg[named_data] = self.localhost
-            else:
-                return
+                    self.msg[named_data] = [self.localhost]
 
             for key, value in self.fib.items():
                 self.msg[key] = value
 
-            sock.sendto(dumps(self.msg).encode('utf-8'), (self.mcast_addr,self.mcast_port))
+            udp_msg = {
+                'type': 'DATA',
+                'id': str(uuid4()),
+                'data': self.msg,
+                'dest': self.mcast_group,
+                'ttl': 30,
+                'source': self.localhost
+            }
 
-        except socket.gaierror as socket_error:
-            print('Sending error: {}'.format(socket_error))
+            send_data.udp_data(udp_msg, '::1', 9999)
 
-        finally:
-            sock.close()
+        except Exception as e:
+            print('Sending error: {}'.format(e))

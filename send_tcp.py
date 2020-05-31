@@ -1,67 +1,69 @@
 import socket
-from json import dumps
+from json import dumps, loads
+from init import get_ip
 import uuid
 #from time import time_ns
 import time
 #from interface import Gui
 
-localhost = '127.0.0.1'
-port = 9999
+class Client:
+    def __init__(self, port=9999):
+        self.localhost = get_ip()
+        self.port = port
 
-def send_message():
-    try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    def send_message(self):
+        try:
+            self.sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+            self.sock.settimeout(15)
+
+            """
+            Utilizar dictionary 'mensagem' da função 'post()':
+            """
+            action = input('GET or POST ?')
+
+            if action == 'GET':
+                road = input(f'Please enter the road name: ')
+                ref = input('Road reference: ')
+
+                interface  = {
+                    'type': 'GET',
+                    'id': '{}.{}'.format(road, ref),
+                    'source' : self.localhost,
+                }
+
+                self.sock.sendto(dumps(interface).encode('utf-8'), self.localhost, self.port)
+                res = loads(self.sock.recv(1024).decode('utf-8'))
+                print(dumps(res, indent=2))
+
+            elif action == 'POST':
+                road = input(f'Please enter the road name: ')
+                ref = input('Road reference: ')
+                message = input('Message: ')
+
+                interface  = {
+                    'type': 'POST',
+                    'id': '{}.{}'.format(road, ref),
+                    'source' : self.localhost,
+                    'data' : message
+                }
+
+                self.sock.sendto(dumps(interface).encode('utf-8'), self.localhost, self.port)
+                res = loads(self.sock.recv(1024).decode('utf-8'))
+                print(dumps(res, indent=2))
+
+            else:
+                print('error')
+
+        except socket.timeout as err:
+            print('Timeout: {}'.format(err))
+
+        except Exception as sock_error:
+            print(f'Failed to create socket: {sock_error}')
         
-    except Exception as sock_error:
-        print(f'Failed to create socket: {sock_error}')
-
-    try:
-        """
-        Utilizar dictionary 'mensagem' da função 'post()':
-        """
-        road = input(f'Please enter the road reference: ')
-        interface  = {
-            'road': road,
-            'type' : 'accident',
-            'ref' : 'close to A3',
-            'timestamp' : time.time()
-        }
-
-        method = input(f'Please enter message method GET|POST: ')
-        dest = input(f'Please enter the destination for the msg: ')
-
-        msg = {
-            'type': method,
-            'source': localhost,
-            'dest': dest,
-            'data': interface
-        }
-
-        print(f'Sending message {msg} to: {localhost} ...')
-        sock.connect((localhost, port))
-        sock.sendall(dumps(msg).encode("utf-8"))
-
-        # Resposta
-        received_msg = sock.recvfrom(4096)
-        print('Preparing to receive back')
-        response = received_msg[0].decode()
-        print(f'Message Received: {response}')
-        
-    except (KeyboardInterrupt, SystemExit) as e:
-        print('Terminating connection with Node ...')
-
-    except socket.gaierror as sock_error:
-        print(f'Sending error \'gaierror\': {sock_error}')
-    
-    except OSError as os_error:
-        print(f'Sending error \'OSError\': {os_error}')
-    
-    finally:        
-        sock.close()
-
-def main():
-    send_message()
+        finally:        
+            self.sock.close()
 
 
 if __name__ == "__main__":
-    main()
+    client = Client()
+    client.send_message()

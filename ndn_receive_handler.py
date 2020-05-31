@@ -16,8 +16,7 @@ class Receive_Handler(Thread):
         self.conn = conn
         self.localhost = localhost
         self.udp_port = udp_port
-        self.msg = loads(self.conn.decode("utf-8"))
-        self.addr = self.msg['source']
+        self.msg = loads(self.conn.recv(1024).decode('utf-8'))
         
     
     def run(self):
@@ -205,7 +204,10 @@ class Receive_Handler(Thread):
         del self.msg['type']
 
         for key, value in self.msg.items():
-            self.fib[key] = value
+            if key in self.fib.keys():
+                self.fib[key] = list(set(value + self.fib[key]))
+            else:
+                self.fib[key] = value
 
     
     def post_handler(self):

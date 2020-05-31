@@ -42,7 +42,7 @@ class UDP_Server(Thread):
 
 
     def receive(self):
-        lifecycle = MyLifecycle(self.route_table, self.lock, self.dead_interv)
+        lifecycle = MyLifecycle(self.route_table, self.queue, self.lock, self.dead_interv)
         lifecycle.start()
 
         print("my ipv6: " + self.local_ip)

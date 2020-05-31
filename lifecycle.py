@@ -4,10 +4,11 @@ from threading import Thread, RLock
 
 
 class MyLifecycle(Thread):
-    def __init__(self, route_table, lock, dead_interval):
+    def __init__(self, route_table, queue, lock, dead_interval):
 
         Thread.__init__(self)
         self.route_table = route_table
+        self.queue = queue
         self.lock = lock
         self.dead_interval = dead_interval
 
@@ -28,3 +29,7 @@ class MyLifecycle(Thread):
             timetable = value['timestamp']
             if timenow > timetable + self.dead_interval:
                 self.route_table.pop(keys)
+
+        for key, value in list(self.queue.items()):
+            if not value:
+                del self.queue[key]
