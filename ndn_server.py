@@ -4,7 +4,7 @@ from ndn_hello_sender import NDN_HelloSender
 import socket
 
 class NDN_Server(Thread):
-    def __init__(self, localhost, port=9999, mcast_group='FF02::1', data_ids={}):
+    def __init__(self, localhost, port=9999, mcast_group='FF02::1', hello_interval=5, data_ids={}):
         Thread.__init__(self)
         self.localhost = localhost
         self.mcast_group = mcast_group
@@ -15,12 +15,13 @@ class NDN_Server(Thread):
         self.cs = {}
         self.fib = {}
         self.pit = {}
+        self.hello_interval = hello_interval
 
 
     def run(self):
         # Check whether we have data in data_ids to add them to cs
         if self.data_ids:
-            for key,value in data_ids.items():
+            for key,value in self.data_ids.items():
                 self.cs[key] = value
 
         #TCP Server
@@ -30,22 +31,21 @@ class NDN_Server(Thread):
 
         # Receiving NDN Messages
         while True:
-            self.conn, _ = self.socket.accept()
-            rcv_msg = self.sock.recvfrom(10240)
+            self.conn, _ = tcp_socket.accept()
+            rcv_msg = tcp_socket.recvfrom(10240)
 
             ndn_handler = Receive_Handler(
                                         self.lock, self.pit, self.fib,
-                                        self.cs, self.conn, self.queue, self.localhost,
-                                        self.udp_port
-
+                                        self.cs, self.conn, self.localhost
                 )
 
             ndn_handler.start()
 
         # Send NDN HELLO messages
         ndn_hello_sender = NDN_HelloSender(
-                                    self.fib, self.lock,self.localhost,
-                                    self.hello_interval, self.cs,
-                                    self.mcast_group, self.port
+                                    self.lock, self.hello_interval, 
+                                    self.cs, self.localhost,
+                                    'multicast', self.port
                                 )
+
         ndn_hello_sender.start()
