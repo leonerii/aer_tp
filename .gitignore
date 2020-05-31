@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 .vscode/*
 server_tcp.py
+tcp_server.py
+interface*
 server_udp.py
-hello_offline.py
 .history/
