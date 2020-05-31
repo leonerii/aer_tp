@@ -4,3 +4,4 @@ __pycache__/
 server_tcp.py
 server_udp.py
 hello_offline.py
+.history/
