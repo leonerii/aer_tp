@@ -80,6 +80,8 @@ class Receive_Handler(Thread):
                 next_hop = self.route_table[target]['next_hop']
                 send_data.udp_data(self.msg, next_hop, self.mcast_port)
 
+            send_data.tcp_data(self.msg['data'], self.localhost, self.mcast_port)
+
         elif self.msg['dest'] not in self.route_table.keys():
             self.queue[self.msg['id']] = self.msg
 
@@ -93,6 +95,7 @@ class Receive_Handler(Thread):
             }
 
             send_data.udp_data(rrequest, self.mcast_addr, self.mcast_port)
+            send_data.tcp_data(self.msg['data'], self.localhost, self.mcast_port)
 
 
     def rrequest_handler(self):

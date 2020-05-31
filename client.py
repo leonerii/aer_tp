@@ -1,51 +1,82 @@
-from json import dumps, loads
-from time import sleep
-from uuid import uuid4
-from os import system
 import socket
-import netifaces
+from json import dumps, loads
+from init import get_ip
+import uuid
+#from time import time_ns
+import time
+#from interface import Gui
+
+class Client:
+    def __init__(self, port=9999):
+        self.localhost = get_ip()
+        self.port = port
+
+    def send_message(self):
+        try:
+            self.sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+            self.sock.connect((self.localhost, self.port))
+            self.sock.settimeout(15)
+            
+            """
+            Utilizar dictionary 'mensagem' da função 'post()':
+            """
+            action = input('GET or POST? ')
+
+            if action == 'GET':
+                road = input(f'Please enter the road name: ')
+                ref = input('Road reference: ')
+
+                interface  = {
+                    'type': 'GET',
+                    'id': '{}.{}'.format(road, ref),
+                    'source' : self.localhost,
+                }
+
+                self.sock.sendall(dumps(interface).encode('utf-8'))
+                res = loads(self.sock.recv(1024).decode('utf-8'))
+
+                if 'status' in res.keys():
+                    print(dumps(res, indent=2))
+
+                    res = loads(self.sock.recv(1024).decode('utf-8'))
+
+                    print(dumps(res, indent=2))
+                
+                else:
+                    print(dumps(res, indent=2))
 
 
-def create_socket():
-    try:
-        client_sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
-        client_sock.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_MULTICAST_HOPS, 1)
+            elif action == 'POST':
+                road = input(f'Please enter the road name: ')
+                ref = input('Road reference: ')
+                message = input('Message: ')
+
+                interface  = {
+                    'type': 'POST',
+                    'id': '{}.{}'.format(road, ref),
+                    'source' : self.localhost,
+                    'data' : message
+                }
+                
+                self.sock.sendall(dumps(interface).encode('utf-8'))
+                res = self.sock.recv(1024).decode('utf-8')
+
+                print(res)
+
+            else:
+                print('error')
+
+        except socket.timeout as err:
+            print('Timeout: {}'.format(err))
+
+        except Exception as sock_error:
+            print(sock_error.with_traceback())
+            print(f'Failed to create socket: {sock_error}')
         
-        return client_sock
-        
-    except Exception as sock_error:
-        print('Failed to create socket: {}'.format(sock_error))
-
-def get_ip():
-    ipv6 = netifaces.ifaddresses('eth0')
-    
-    return ipv6[netifaces.AF_INET6][0]['addr']
- 
-def run():
-    ipv6 = get_ip()
-    try:
-        input_data = input('Type your message: ')
-        dest = input('Destination address: ')
-
-        sock = create_socket()
-        msg = {
-            'type': 'DATA',
-            'id': str(uuid4()),
-            'data': input_data,
-            'dest': dest,
-            'ttl': 30,
-            'source': ipv6
-        }
-
-        print(msg)
-
-        sock.sendto(dumps(msg).encode('utf-8'), ('::1', 9999))
-    except Exception as e:
-        print(e.with_traceback())
-
-    finally:
-        sock.close()
+        finally:        
+            self.sock.close()
 
 
-run()
-#print(get_ip())
+if __name__ == "__main__":
+    client = Client()
+    client.send_message()
