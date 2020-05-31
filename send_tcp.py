@@ -15,11 +15,11 @@ class Client:
         try:
             self.sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
             self.sock.settimeout(15)
-
+            
             """
             Utilizar dictionary 'mensagem' da função 'post()':
             """
-            action = input('GET or POST ?')
+            action = input('GET or POST? ')
 
             if action == 'GET':
                 road = input(f'Please enter the road name: ')
@@ -31,7 +31,7 @@ class Client:
                     'source' : self.localhost,
                 }
 
-                self.sock.sendto(dumps(interface).encode('utf-8'), self.localhost, self.port)
+                self.sock.sendto(dumps(interface).encode('utf-8'), (self.localhost, self.port))
                 res = loads(self.sock.recv(1024).decode('utf-8'))
                 print(dumps(res, indent=2))
 
@@ -46,8 +46,8 @@ class Client:
                     'source' : self.localhost,
                     'data' : message
                 }
-
-                self.sock.sendto(dumps(interface).encode('utf-8'), self.localhost, self.port)
+                
+                self.sock.sendto(dumps(interface).encode('utf-8'), (self.localhost, self.port))
                 res = loads(self.sock.recv(1024).decode('utf-8'))
                 print(dumps(res, indent=2))
 
