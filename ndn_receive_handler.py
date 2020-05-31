@@ -76,7 +76,7 @@ class Receive_Handler(Thread):
                     'id': msg_id,
                     'source': self.localhost
                 },
-                'dest': self.fib[msg_id],
+                'dest': self.fib[msg_id][0],
                 'ttl': 30,
                 'source': self.localhost
             }
@@ -153,7 +153,7 @@ class Receive_Handler(Thread):
                     'id': msg_id,
                     'source': self.localhost
                 },
-                'dest': self.fib[msg_id],
+                'dest': self.fib[msg_id][0],
                 'ttl': 30,
                 'source': self.localhost
             }
@@ -202,6 +202,8 @@ class Receive_Handler(Thread):
 
     
     def hello_handler(self):
+        del self.msg['type']
+
         for key, value in self.msg.items():
             self.fib[key] = value
 
