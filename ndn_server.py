@@ -19,36 +19,6 @@ class NDN_Server(Thread):
 
     def run(self):
         # Check whether we have data in data_ids to add them to cs
-        """
-        data_ids = {
-            'N104.continente': '',
-            'N101.A3' : '',
-            'N14.braga_parque': '',
-            'N4.celerois' : ''
-        }
-
-        self.fib = {
-            'N104.continente': {
-                'Name': 'N104.continente'
-                'interfaces' : ['source1','source2']
-                },
-            'N14.A3': {
-                'Name': 'N14.A3'
-                'interfaces' : ['source1']
-                }
-            }
-
-        self.cs = {
-            'N104.continente': 'acidente',
-            'N101.A3' : ''
-        }
-
-        self.pit = {
-            'N104.continente.acidente': [$requester1, $requester2],
-            'N101.pingodoce.trabalhos': [$requester]
-        }
-
-        """
         if self.data_ids:
             for key,value in data_ids.items():
                 self.cs[key] = value

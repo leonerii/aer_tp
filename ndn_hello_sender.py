@@ -39,7 +39,6 @@ class NDN_HelloSender(Thread):
             # Hello message to be sent
             self.msg = {
                 "type": "HELLO",
-                #"source": self.localhost,
                 }
 
             if self.cs:

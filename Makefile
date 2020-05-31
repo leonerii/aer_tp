@@ -3,3 +3,6 @@ run:
 
 send:
 	@python3 client.py
+
+send_tcp:
+	@python3 send_tcp.py
